@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApoioAoClienteRouteImport } from './routes/apoio-ao-cliente'
 import { Route as JornadaRouteImport } from './routes/jornada'
+import { Route as KanbanRouteImport } from './routes/kanban'
 import { Route as MarketingRouteImport } from './routes/marketing'
 import { Route as StakeholdersRouteImport } from './routes/stakeholders'
 import { Route as VendasRouteImport } from './routes/vendas'
@@ -20,9 +22,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApoioAoClienteRoute = ApoioAoClienteRouteImport.update({
+  id: '/apoio-ao-cliente',
+  path: '/apoio-ao-cliente',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JornadaRoute = JornadaRouteImport.update({
   id: '/jornada',
   path: '/jornada',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KanbanRoute = KanbanRouteImport.update({
+  id: '/kanban',
+  path: '/kanban',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketingRoute = MarketingRouteImport.update({
@@ -43,14 +55,18 @@ const VendasRoute = VendasRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/apoio-ao-cliente': typeof ApoioAoClienteRoute
   '/jornada': typeof JornadaRoute
+  '/kanban': typeof KanbanRoute
   '/marketing': typeof MarketingRoute
   '/stakeholders': typeof StakeholdersRoute
   '/vendas': typeof VendasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/apoio-ao-cliente': typeof ApoioAoClienteRoute
   '/jornada': typeof JornadaRoute
+  '/kanban': typeof KanbanRoute
   '/marketing': typeof MarketingRoute
   '/stakeholders': typeof StakeholdersRoute
   '/vendas': typeof VendasRoute
@@ -58,22 +74,48 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/apoio-ao-cliente': typeof ApoioAoClienteRoute
   '/jornada': typeof JornadaRoute
+  '/kanban': typeof KanbanRoute
   '/marketing': typeof MarketingRoute
   '/stakeholders': typeof StakeholdersRoute
   '/vendas': typeof VendasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/jornada' | '/marketing' | '/stakeholders' | '/vendas'
+  fullPaths:
+    | '/'
+    | '/apoio-ao-cliente'
+    | '/jornada'
+    | '/kanban'
+    | '/marketing'
+    | '/stakeholders'
+    | '/vendas'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/jornada' | '/marketing' | '/stakeholders' | '/vendas'
-  id: '__root__' | '/' | '/jornada' | '/marketing' | '/stakeholders' | '/vendas'
+  to:
+    | '/'
+    | '/apoio-ao-cliente'
+    | '/jornada'
+    | '/kanban'
+    | '/marketing'
+    | '/stakeholders'
+    | '/vendas'
+  id:
+    | '__root__'
+    | '/'
+    | '/apoio-ao-cliente'
+    | '/jornada'
+    | '/kanban'
+    | '/marketing'
+    | '/stakeholders'
+    | '/vendas'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApoioAoClienteRoute: typeof ApoioAoClienteRoute
   JornadaRoute: typeof JornadaRoute
+  KanbanRoute: typeof KanbanRoute
   MarketingRoute: typeof MarketingRoute
   StakeholdersRoute: typeof StakeholdersRoute
   VendasRoute: typeof VendasRoute
@@ -88,11 +130,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/apoio-ao-cliente': {
+      id: '/apoio-ao-cliente'
+      path: '/apoio-ao-cliente'
+      fullPath: '/apoio-ao-cliente'
+      preLoaderRoute: typeof ApoioAoClienteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/jornada': {
       id: '/jornada'
       path: '/jornada'
       fullPath: '/jornada'
       preLoaderRoute: typeof JornadaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kanban': {
+      id: '/kanban'
+      path: '/kanban'
+      fullPath: '/kanban'
+      preLoaderRoute: typeof KanbanRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/marketing': {
@@ -121,7 +177,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApoioAoClienteRoute: ApoioAoClienteRoute,
   JornadaRoute: JornadaRoute,
+  KanbanRoute: KanbanRoute,
   MarketingRoute: MarketingRoute,
   StakeholdersRoute: StakeholdersRoute,
   VendasRoute: VendasRoute,
