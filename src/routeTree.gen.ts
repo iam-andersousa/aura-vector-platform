@@ -10,33 +10,180 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApoioAoClienteRouteImport } from './routes/apoio-ao-cliente'
+import { Route as AutomacoesRouteImport } from './routes/automacoes'
+import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
+import { Route as IntegracoesRouteImport } from './routes/integracoes'
+import { Route as InteligenciaIaRouteImport } from './routes/inteligencia-ia'
+import { Route as JornadaRouteImport } from './routes/jornada'
+import { Route as KanbanRouteImport } from './routes/kanban'
+import { Route as MarketingRouteImport } from './routes/marketing'
+import { Route as RelatoriosRouteImport } from './routes/relatorios'
+import { Route as StakeholdersRouteImport } from './routes/stakeholders'
+import { Route as VendasRouteImport } from './routes/vendas'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApoioAoClienteRoute = ApoioAoClienteRouteImport.update({
+  id: '/apoio-ao-cliente',
+  path: '/apoio-ao-cliente',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AutomacoesRoute = AutomacoesRouteImport.update({
+  id: '/automacoes',
+  path: '/automacoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfiguracoesRoute = ConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegracoesRoute = IntegracoesRouteImport.update({
+  id: '/integracoes',
+  path: '/integracoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InteligenciaIaRoute = InteligenciaIaRouteImport.update({
+  id: '/inteligencia-ia',
+  path: '/inteligencia-ia',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JornadaRoute = JornadaRouteImport.update({
+  id: '/jornada',
+  path: '/jornada',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KanbanRoute = KanbanRouteImport.update({
+  id: '/kanban',
+  path: '/kanban',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketingRoute = MarketingRouteImport.update({
+  id: '/marketing',
+  path: '/marketing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RelatoriosRoute = RelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StakeholdersRoute = StakeholdersRouteImport.update({
+  id: '/stakeholders',
+  path: '/stakeholders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VendasRoute = VendasRouteImport.update({
+  id: '/vendas',
+  path: '/vendas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/apoio-ao-cliente': typeof ApoioAoClienteRoute
+  '/automacoes': typeof AutomacoesRoute
+  '/configuracoes': typeof ConfiguracoesRoute
+  '/integracoes': typeof IntegracoesRoute
+  '/inteligencia-ia': typeof InteligenciaIaRoute
+  '/jornada': typeof JornadaRoute
+  '/kanban': typeof KanbanRoute
+  '/marketing': typeof MarketingRoute
+  '/relatorios': typeof RelatoriosRoute
+  '/stakeholders': typeof StakeholdersRoute
+  '/vendas': typeof VendasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/apoio-ao-cliente': typeof ApoioAoClienteRoute
+  '/automacoes': typeof AutomacoesRoute
+  '/configuracoes': typeof ConfiguracoesRoute
+  '/integracoes': typeof IntegracoesRoute
+  '/inteligencia-ia': typeof InteligenciaIaRoute
+  '/jornada': typeof JornadaRoute
+  '/kanban': typeof KanbanRoute
+  '/marketing': typeof MarketingRoute
+  '/relatorios': typeof RelatoriosRoute
+  '/stakeholders': typeof StakeholdersRoute
+  '/vendas': typeof VendasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/apoio-ao-cliente': typeof ApoioAoClienteRoute
+  '/automacoes': typeof AutomacoesRoute
+  '/configuracoes': typeof ConfiguracoesRoute
+  '/integracoes': typeof IntegracoesRoute
+  '/inteligencia-ia': typeof InteligenciaIaRoute
+  '/jornada': typeof JornadaRoute
+  '/kanban': typeof KanbanRoute
+  '/marketing': typeof MarketingRoute
+  '/relatorios': typeof RelatoriosRoute
+  '/stakeholders': typeof StakeholdersRoute
+  '/vendas': typeof VendasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/apoio-ao-cliente'
+    | '/automacoes'
+    | '/configuracoes'
+    | '/integracoes'
+    | '/inteligencia-ia'
+    | '/jornada'
+    | '/kanban'
+    | '/marketing'
+    | '/relatorios'
+    | '/stakeholders'
+    | '/vendas'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/apoio-ao-cliente'
+    | '/automacoes'
+    | '/configuracoes'
+    | '/integracoes'
+    | '/inteligencia-ia'
+    | '/jornada'
+    | '/kanban'
+    | '/marketing'
+    | '/relatorios'
+    | '/stakeholders'
+    | '/vendas'
+  id:
+    | '__root__'
+    | '/'
+    | '/apoio-ao-cliente'
+    | '/automacoes'
+    | '/configuracoes'
+    | '/integracoes'
+    | '/inteligencia-ia'
+    | '/jornada'
+    | '/kanban'
+    | '/marketing'
+    | '/relatorios'
+    | '/stakeholders'
+    | '/vendas'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApoioAoClienteRoute: typeof ApoioAoClienteRoute
+  AutomacoesRoute: typeof AutomacoesRoute
+  ConfiguracoesRoute: typeof ConfiguracoesRoute
+  IntegracoesRoute: typeof IntegracoesRoute
+  InteligenciaIaRoute: typeof InteligenciaIaRoute
+  JornadaRoute: typeof JornadaRoute
+  KanbanRoute: typeof KanbanRoute
+  MarketingRoute: typeof MarketingRoute
+  RelatoriosRoute: typeof RelatoriosRoute
+  StakeholdersRoute: typeof StakeholdersRoute
+  VendasRoute: typeof VendasRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +195,100 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/apoio-ao-cliente': {
+      id: '/apoio-ao-cliente'
+      path: '/apoio-ao-cliente'
+      fullPath: '/apoio-ao-cliente'
+      preLoaderRoute: typeof ApoioAoClienteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/automacoes': {
+      id: '/automacoes'
+      path: '/automacoes'
+      fullPath: '/automacoes'
+      preLoaderRoute: typeof AutomacoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/configuracoes': {
+      id: '/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof ConfiguracoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integracoes': {
+      id: '/integracoes'
+      path: '/integracoes'
+      fullPath: '/integracoes'
+      preLoaderRoute: typeof IntegracoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inteligencia-ia': {
+      id: '/inteligencia-ia'
+      path: '/inteligencia-ia'
+      fullPath: '/inteligencia-ia'
+      preLoaderRoute: typeof InteligenciaIaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jornada': {
+      id: '/jornada'
+      path: '/jornada'
+      fullPath: '/jornada'
+      preLoaderRoute: typeof JornadaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kanban': {
+      id: '/kanban'
+      path: '/kanban'
+      fullPath: '/kanban'
+      preLoaderRoute: typeof KanbanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketing': {
+      id: '/marketing'
+      path: '/marketing'
+      fullPath: '/marketing'
+      preLoaderRoute: typeof MarketingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/relatorios': {
+      id: '/relatorios'
+      path: '/relatorios'
+      fullPath: '/relatorios'
+      preLoaderRoute: typeof RelatoriosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stakeholders': {
+      id: '/stakeholders'
+      path: '/stakeholders'
+      fullPath: '/stakeholders'
+      preLoaderRoute: typeof StakeholdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vendas': {
+      id: '/vendas'
+      path: '/vendas'
+      fullPath: '/vendas'
+      preLoaderRoute: typeof VendasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApoioAoClienteRoute: ApoioAoClienteRoute,
+  AutomacoesRoute: AutomacoesRoute,
+  ConfiguracoesRoute: ConfiguracoesRoute,
+  IntegracoesRoute: IntegracoesRoute,
+  InteligenciaIaRoute: InteligenciaIaRoute,
+  JornadaRoute: JornadaRoute,
+  KanbanRoute: KanbanRoute,
+  MarketingRoute: MarketingRoute,
+  RelatoriosRoute: RelatoriosRoute,
+  StakeholdersRoute: StakeholdersRoute,
+  VendasRoute: VendasRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
