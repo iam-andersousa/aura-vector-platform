@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as JornadaRouteImport } from './routes/jornada'
+import { Route as MarketingRouteImport } from './routes/marketing'
 import { Route as StakeholdersRouteImport } from './routes/stakeholders'
+import { Route as VendasRouteImport } from './routes/vendas'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -23,40 +25,58 @@ const JornadaRoute = JornadaRouteImport.update({
   path: '/jornada',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketingRoute = MarketingRouteImport.update({
+  id: '/marketing',
+  path: '/marketing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StakeholdersRoute = StakeholdersRouteImport.update({
   id: '/stakeholders',
   path: '/stakeholders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VendasRoute = VendasRouteImport.update({
+  id: '/vendas',
+  path: '/vendas',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/jornada': typeof JornadaRoute
+  '/marketing': typeof MarketingRoute
   '/stakeholders': typeof StakeholdersRoute
+  '/vendas': typeof VendasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/jornada': typeof JornadaRoute
+  '/marketing': typeof MarketingRoute
   '/stakeholders': typeof StakeholdersRoute
+  '/vendas': typeof VendasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/jornada': typeof JornadaRoute
+  '/marketing': typeof MarketingRoute
   '/stakeholders': typeof StakeholdersRoute
+  '/vendas': typeof VendasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/jornada' | '/stakeholders'
+  fullPaths: '/' | '/jornada' | '/marketing' | '/stakeholders' | '/vendas'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/jornada' | '/stakeholders'
-  id: '__root__' | '/' | '/jornada' | '/stakeholders'
+  to: '/' | '/jornada' | '/marketing' | '/stakeholders' | '/vendas'
+  id: '__root__' | '/' | '/jornada' | '/marketing' | '/stakeholders' | '/vendas'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   JornadaRoute: typeof JornadaRoute
+  MarketingRoute: typeof MarketingRoute
   StakeholdersRoute: typeof StakeholdersRoute
+  VendasRoute: typeof VendasRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -75,11 +95,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JornadaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/marketing': {
+      id: '/marketing'
+      path: '/marketing'
+      fullPath: '/marketing'
+      preLoaderRoute: typeof MarketingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/stakeholders': {
       id: '/stakeholders'
       path: '/stakeholders'
       fullPath: '/stakeholders'
       preLoaderRoute: typeof StakeholdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vendas': {
+      id: '/vendas'
+      path: '/vendas'
+      fullPath: '/vendas'
+      preLoaderRoute: typeof VendasRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -88,7 +122,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   JornadaRoute: JornadaRoute,
+  MarketingRoute: MarketingRoute,
   StakeholdersRoute: StakeholdersRoute,
+  VendasRoute: VendasRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
