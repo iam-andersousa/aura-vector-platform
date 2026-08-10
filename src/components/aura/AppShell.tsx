@@ -5,15 +5,18 @@ import {
   ChevronLeft,
   FileBarChart,
   Gauge,
+  HelpCircle,
   KanbanSquare,
   LayoutGrid,
   LifeBuoy,
+  LogOut,
   Megaphone,
   Menu,
   Moon,
   Plug,
   Plus,
   Route as RouteIcon,
+  Rocket,
   Search,
   Settings,
   Sun,
@@ -21,12 +24,13 @@ import {
   Workflow,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import logoDark from "@/assets/aura-logo-dark.png.asset.json";
 import logoLight from "@/assets/aura-logo-light.png.asset.json";
 import markDark from "@/assets/aura-mark-dark.png.asset.json";
 import markWhite from "@/assets/aura-mark-white.png.asset.json";
+import profilePic from "@/assets/profile-user.png.asset.json";
 import { useTheme } from "@/components/aura/theme";
 import { cn } from "@/lib/utils";
 
@@ -52,7 +56,7 @@ function Logo({ collapsed }: { collapsed: boolean }) {
       <img
         src={theme === "dark" ? markWhite.url : markDark.url}
         alt="Aura Vector"
-        className="h-7 w-7"
+        className="h-10 w-10"
       />
     );
   }
@@ -60,8 +64,76 @@ function Logo({ collapsed }: { collapsed: boolean }) {
     <img
       src={theme === "dark" ? logoLight.url : logoDark.url}
       alt="Aura Vector"
-      className="h-6 w-auto"
+      className="h-10 w-auto"
     />
+  );
+}
+
+function UserMenu() {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [open]);
+
+  const items = [
+    { label: "Configurações", icon: Settings, to: "/configuracoes" },
+    { label: "Fazer upgrade", icon: Rocket },
+    { label: "Ajuda & suporte", icon: HelpCircle },
+    { label: "Sair", icon: LogOut },
+  ] as const;
+
+  return (
+    <div className="relative pl-1" ref={ref}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className="flex items-center gap-2 rounded-full p-0.5 transition-colors hover:bg-muted"
+      >
+        <img
+          src={profilePic.url}
+          alt="Marina Souza"
+          className="h-9 w-9 rounded-full object-cover"
+        />
+        <div className="hidden pr-1 text-left leading-tight xl:block">
+          <p className="text-xs font-medium">Marina Souza</p>
+          <p className="text-[11px] text-muted-foreground">Head de RevOps</p>
+        </div>
+      </button>
+      {open ? (
+        <div className="surface absolute right-0 top-[calc(100%+10px)] z-50 w-56 overflow-hidden p-1.5 shadow-xl">
+          {items.map((item) =>
+            "to" in item && item.to ? (
+              <Link
+                key={item.label}
+                to={item.to}
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <item.icon className="h-4 w-4" />
+                {item.label}
+              </Link>
+            ) : (
+              <button
+                key={item.label}
+                onClick={() => setOpen(false)}
+                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <item.icon className="h-4 w-4" />
+                {item.label}
+              </button>
+            ),
+          )}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
