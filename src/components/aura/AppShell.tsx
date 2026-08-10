@@ -178,15 +178,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         ) : null}
-        <button
-          onClick={() => setCollapsed((c) => !c)}
-          className="mt-3 hidden w-full items-center justify-center gap-2 rounded-xl border border-border py-2 text-xs text-muted-foreground transition-colors hover:text-foreground lg:flex"
-        >
-          <ChevronLeft
-            className={cn("h-3.5 w-3.5 transition-transform", collapsed && "rotate-180")}
-          />
-          {!collapsed ? "Recolher" : null}
-        </button>
       </div>
     </nav>
   );
@@ -202,7 +193,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           >
             <Menu className="h-4 w-4" />
           </button>
-          <Link to="/" className="hidden lg:flex" style={{ width: collapsed ? 44 : 232 }}>
+          <Link
+            to="/"
+            className="hidden items-center lg:flex"
+            style={{ width: collapsed ? 52 : 232 }}
+          >
             <Logo collapsed={collapsed} />
           </Link>
           <div className="lg:hidden">
@@ -240,15 +235,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Nova ação</span>
             </button>
-            <div className="flex items-center gap-2 pl-1">
-              <span className="gradient-aura flex h-9 w-9 items-center justify-center rounded-full text-xs font-medium text-white">
-                MS
-              </span>
-              <div className="hidden leading-tight xl:block">
-                <p className="text-xs font-medium">Marina Souza</p>
-                <p className="text-[11px] text-muted-foreground">Head de RevOps</p>
-              </div>
-            </div>
+            <UserMenu />
           </div>
         </div>
       </header>
@@ -259,6 +246,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           style={{ width: collapsed ? 76 : 260 }}
         >
           {sidebar}
+          <button
+            onClick={() => setCollapsed((c) => !c)}
+            aria-label={collapsed ? "Expandir barra lateral" : "Recolher barra lateral"}
+            className="absolute -right-3.5 top-1/2 z-30 hidden h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-sm transition-colors hover:border-primary hover:text-primary lg:flex"
+          >
+            <ChevronLeft
+              className={cn("h-3.5 w-3.5 transition-transform", collapsed && "rotate-180")}
+            />
+          </button>
         </aside>
 
         {mobileOpen ? (
