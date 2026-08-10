@@ -166,7 +166,7 @@ export function Modal({
   open: boolean;
   onClose: () => void;
   title: string;
-  subtitle?: string;
+  subtitle?: string | undefined;
   children: React.ReactNode;
   footer?: React.ReactNode;
 }) {
