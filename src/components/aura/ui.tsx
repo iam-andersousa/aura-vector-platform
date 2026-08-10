@@ -305,17 +305,26 @@ export function AiCard({
         className,
       )}
     >
-      <div className="h-full rounded-[calc(var(--radius-xl)-1px)] bg-card p-5">
-        <div className="flex items-center justify-between gap-3">
-          <span className="gradient-aura inline-flex h-7 w-7 items-center justify-center rounded-full">
-            <Sparkles className="h-3.5 w-3.5 text-white" />
-          </span>
-          {tag ? <Chip>{tag}</Chip> : null}
+      <div className="relative h-full overflow-hidden rounded-[calc(var(--radius-xl)-1px)] bg-card">
+        <img
+          src={aiBg.url}
+          alt=""
+          aria-hidden
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-card/78 backdrop-blur-[2px]" />
+        <div className="relative p-5">
+          <div className="flex items-center justify-between gap-3">
+            <span className="gradient-aura inline-flex h-7 w-7 items-center justify-center rounded-full">
+              <Sparkles className="h-3.5 w-3.5 text-white" />
+            </span>
+            {tag ? <Chip>{tag}</Chip> : null}
+          </div>
+          <p className="mt-4 text-sm font-display leading-snug">{title}</p>
+          <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+            {body}
+          </p>
         </div>
-        <p className="mt-4 text-sm font-display leading-snug">{title}</p>
-        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-          {body}
-        </p>
       </div>
     </div>
   );
@@ -381,6 +390,8 @@ export function RoundedBars({
   height?: number;
   highlight?: number;
 }) {
+  const avg =
+    data.reduce((s, d) => s + Number(d[dataKey] ?? 0), 0) / Math.max(1, data.length);
   return (
     <div style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
@@ -402,6 +413,17 @@ export function RoundedBars({
             tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }}
           />
           <Tooltip cursor={{ fill: "var(--color-muted)" }} {...chartTooltip} />
+          <ReferenceLine
+            y={avg}
+            stroke="var(--color-muted-foreground)"
+            strokeDasharray="4 5"
+            label={{
+              value: "média",
+              position: "insideTopRight",
+              fill: "var(--color-muted-foreground)",
+              fontSize: 10,
+            }}
+          />
           <Bar dataKey={dataKey} radius={[10, 10, 10, 10]} barSize={26}>
             {data.map((_, i) => (
               <Cell
@@ -426,6 +448,8 @@ export function TrendArea({
   color?: string;
   height?: number;
 }) {
+  const avg =
+    data.reduce((s, d) => s + Number(d["value"] ?? 0), 0) / Math.max(1, data.length);
   return (
     <div style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
@@ -453,6 +477,17 @@ export function TrendArea({
             tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }}
           />
           <Tooltip {...chartTooltip} />
+          <ReferenceLine
+            y={avg}
+            stroke="var(--color-muted-foreground)"
+            strokeDasharray="4 5"
+            label={{
+              value: "média",
+              position: "insideTopRight",
+              fill: "var(--color-muted-foreground)",
+              fontSize: 10,
+            }}
+          />
           <Area
             type="monotone"
             dataKey="value"
