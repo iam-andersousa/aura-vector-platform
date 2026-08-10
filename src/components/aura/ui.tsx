@@ -542,6 +542,116 @@ export function Gauge({
   );
 }
 
+const donutPalette = [
+  "var(--sales)",
+  "color-mix(in oklab, var(--sales) 72%, white)",
+  "color-mix(in oklab, var(--sales) 48%, white)",
+  "var(--cs)",
+  "var(--mkt)",
+  "var(--success)",
+];
+
+export function Donut({
+  data,
+  height = 260,
+  centerLabel,
+  unit = "",
+}: {
+  data: Array<{ label: string; value: number }>;
+  height?: number;
+  centerLabel?: string;
+  unit?: string;
+}) {
+  const total = data.reduce((s, d) => s + d.value, 0);
+  return (
+    <div className="flex flex-wrap items-center gap-6">
+      <div className="relative" style={{ height, width: height }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Tooltip {...chartTooltip} />
+            <Pie
+              data={data}
+              dataKey="value"
+              nameKey="label"
+              innerRadius="62%"
+              outerRadius="92%"
+              paddingAngle={4}
+              cornerRadius={12}
+              stroke="none"
+            >
+              {data.map((_, i) => (
+                <Cell key={i} fill={donutPalette[i % donutPalette.length]} />
+              ))}
+            </Pie>
+          </PieChart>
+        </ResponsiveContainer>
+        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+          <p className="text-2xl font-display">
+            {total.toLocaleString("pt-BR")}
+            {unit}
+          </p>
+          <p className="eyebrow mt-1">{centerLabel ?? "Total"}</p>
+        </div>
+      </div>
+      <ul className="min-w-[150px] flex-1 space-y-2.5">
+        {data.map((d, i) => (
+          <li key={d.label} className="flex items-center gap-2.5 text-xs">
+            <span
+              className="h-2.5 w-2.5 shrink-0 rounded-full"
+              style={{ background: donutPalette[i % donutPalette.length] }}
+            />
+            <span className="flex-1 truncate">{d.label}</span>
+            <span className="text-muted-foreground">
+              {total ? Math.round((d.value / total) * 100) : 0}%
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function GaugeLegacy({
+  value,
+  label,
+  tone = "var(--sales)",
+}: {
+  value: number;
+  label: string;
+  tone?: string;
+}) {
+  const r = 42;
+  const c = 2 * Math.PI * r;
+  return (
+    <div className="flex items-center gap-4">
+      <svg viewBox="0 0 100 100" className="h-24 w-24 -rotate-90">
+        <circle
+          cx="50"
+          cy="50"
+          r={r}
+          fill="none"
+          stroke="var(--color-muted)"
+          strokeWidth="8"
+        />
+        <circle
+          cx="50"
+          cy="50"
+          r={r}
+          fill="none"
+          stroke={tone}
+          strokeWidth="8"
+          strokeLinecap="round"
+          strokeDasharray={`${(value / 100) * c} ${c}`}
+        />
+      </svg>
+      <div>
+        <p className="text-2xl font-display">{value}</p>
+        <p className="text-xs text-muted-foreground">{label}</p>
+      </div>
+    </div>
+  );
+}
+
 export function HealthDots({ value }: { value: number }) {
   const filled = Math.round(value / 20);
   const tone =
