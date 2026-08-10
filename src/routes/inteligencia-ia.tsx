@@ -52,7 +52,7 @@ function IaPage() {
                 <Sparkles className="h-4 w-4 text-white" />
               </span>
               <h2 className="mt-4 text-2xl font-display">
-                <span className="gradient-aura-text">Aura Intelligence</span> lê o
+                <span className="gradient-aura-text">Vector</span> lê o
                 relacionamento inteiro
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">
