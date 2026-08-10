@@ -611,47 +611,6 @@ export function Donut({
   );
 }
 
-function GaugeLegacy({
-  value,
-  label,
-  tone = "var(--sales)",
-}: {
-  value: number;
-  label: string;
-  tone?: string;
-}) {
-  const r = 42;
-  const c = 2 * Math.PI * r;
-  return (
-    <div className="flex items-center gap-4">
-      <svg viewBox="0 0 100 100" className="h-24 w-24 -rotate-90">
-        <circle
-          cx="50"
-          cy="50"
-          r={r}
-          fill="none"
-          stroke="var(--color-muted)"
-          strokeWidth="8"
-        />
-        <circle
-          cx="50"
-          cy="50"
-          r={r}
-          fill="none"
-          stroke={tone}
-          strokeWidth="8"
-          strokeLinecap="round"
-          strokeDasharray={`${(value / 100) * c} ${c}`}
-        />
-      </svg>
-      <div>
-        <p className="text-2xl font-display">{value}</p>
-        <p className="text-xs text-muted-foreground">{label}</p>
-      </div>
-    </div>
-  );
-}
-
 export function HealthDots({ value }: { value: number }) {
   const filled = Math.round(value / 20);
   const tone =
