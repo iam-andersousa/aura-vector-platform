@@ -1,14 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Filter, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { useState } from "react";
 
-import { RevOpsVenn } from "@/components/aura/RevOpsVenn";
 import {
   AiCard,
   Chip,
+  Donut,
   Panel,
   PageHeader,
   ProgressBar,
   RoundedBars,
+  SegmentedFilter,
   SectionTitle,
   StatCard,
   TrendArea,
@@ -50,7 +52,18 @@ const areaTone: Record<string, "mkt" | "sales" | "cs"> = {
   "Apoio ao Cliente": "cs",
 };
 
+const periods = ["30 dias", "90 dias", "12 meses"] as const;
+const sectors = ["Todos", "Marketing", "Vendas", "Apoio ao Cliente"] as const;
+
 function CommandCenter() {
+  const [period, setPeriod] = useState<string>("90 dias");
+  const [sector, setSector] = useState<string>("Todos");
+
+  const visibleKpis = kpis.filter((k) => sector === "Todos" || k.area === sector);
+  const visibleInsights = aiInsights.filter(
+    (i) => sector === "Todos" || i.tag === sector,
+  );
+
   return (
     <>
       <PageHeader
@@ -58,10 +71,8 @@ function CommandCenter() {
         title="Clareza para vender, atender e crescer."
         subtitle="Marketing, vendas e apoio ao cliente na mesma visão de receita e relacionamento."
       >
-        <button className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm text-muted-foreground hover:text-foreground">
-          <Filter className="h-4 w-4" />
-          Últimos 90 dias
-        </button>
+        <SegmentedFilter options={periods} value={period} onChange={setPeriod} />
+        <SegmentedFilter options={sectors} value={sector} onChange={setSector} />
         <Link
           to="/jornada"
           className="inline-flex items-center gap-2 rounded-xl bg-primary px-3.5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90"
@@ -72,9 +83,11 @@ function CommandCenter() {
       </PageHeader>
 
       <section>
-        <SectionTitle>Indicadores da operação</SectionTitle>
+        <SectionTitle action={<Chip tone="sales">{period}</Chip>}>
+          Indicadores da operação
+        </SectionTitle>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {kpis.map((k) => (
+          {visibleKpis.map((k) => (
             <StatCard key={k.label} {...k} />
           ))}
         </div>
@@ -85,7 +98,7 @@ function CommandCenter() {
           Inteligência artificial
         </SectionTitle>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {aiInsights.map((i) => (
+          {visibleInsights.map((i) => (
             <AiCard key={i.title} {...i} />
           ))}
         </div>
@@ -114,11 +127,6 @@ function CommandCenter() {
             ))}
           </div>
         </Panel>
-      </section>
-
-      <section>
-        <SectionTitle>Interseção RevOps</SectionTitle>
-        <RevOpsVenn />
       </section>
 
       <section>
@@ -158,15 +166,15 @@ function CommandCenter() {
       <section className="grid gap-4 lg:grid-cols-2">
         <Panel>
           <SectionTitle>Leads por canal</SectionTitle>
-          <RoundedBars
+          <Donut
+            centerLabel="leads"
             data={[
-              { label: "LinkedIn", value: 312 },
-              { label: "Google", value: 428 },
-              { label: "Meta", value: 596 },
-              { label: "RD", value: 184 },
+              { label: "Meta Ads", value: 596 },
+              { label: "Google Ads", value: 428 },
+              { label: "LinkedIn Ads", value: 312 },
+              { label: "RD Station", value: 184 },
               { label: "Orgânico", value: 141 },
             ]}
-            highlight={2}
           />
         </Panel>
         <Panel>
@@ -179,7 +187,7 @@ function CommandCenter() {
               { label: "Proposta", value: 9 },
               { label: "Onboard.", value: 14 },
             ]}
-            color="var(--cs)"
+            color="var(--sales)"
           />
         </Panel>
       </section>

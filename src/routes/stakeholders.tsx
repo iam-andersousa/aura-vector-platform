@@ -6,6 +6,7 @@ import {
   AiBadge,
   Chip,
   HealthDots,
+  Modal,
   PageHeader,
   Panel,
   ProgressBar,
@@ -41,6 +42,7 @@ function StakeholdersPage() {
   const [query, setQuery] = useState("");
   const [type, setType] = useState("Todos");
   const [selectedId, setSelectedId] = useState(stakeholders[0]!.id);
+  const [openNew, setOpenNew] = useState(false);
 
   const filtered = stakeholders.filter(
     (s) =>
@@ -56,11 +58,72 @@ function StakeholdersPage() {
         title="Entenda cada relação antes de agir."
         subtitle="Aura Vector não enxerga apenas “lead” ou “cliente” — enxerga cada stakeholder relevante para a receita."
       >
-        <button className="inline-flex items-center gap-2 rounded-xl bg-primary px-3.5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90">
+        <button
+          onClick={() => setOpenNew(true)}
+          className="inline-flex items-center gap-2 rounded-xl bg-primary px-3.5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90"
+        >
           <Plus className="h-4 w-4" />
           Novo stakeholder
         </button>
       </PageHeader>
+
+      <Modal
+        open={openNew}
+        onClose={() => setOpenNew(false)}
+        title="Novo stakeholder"
+        subtitle="Cadastre um lead, cliente, usuário, parceiro ou decisor."
+        footer={
+          <>
+            <button
+              onClick={() => setOpenNew(false)}
+              className="rounded-xl border border-border px-3.5 py-2 text-sm text-muted-foreground hover:text-foreground"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={() => setOpenNew(false)}
+              className="rounded-xl bg-primary px-3.5 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+            >
+              Salvar stakeholder
+            </button>
+          </>
+        }
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          {[
+            ["Nome completo", "Ex.: Helena Duarte"],
+            ["Empresa", "Ex.: Grupo Vertex"],
+            ["E-mail", "nome@empresa.com"],
+            ["Telefone", "+55 11 90000-0000"],
+            ["Origem do contato", "Ex.: LinkedIn Ads"],
+            ["Valor potencial", "Ex.: R$ 320k"],
+          ].map(([label, ph]) => (
+            <label key={label} className="block text-xs">
+              <span className="text-muted-foreground">{label}</span>
+              <input
+                placeholder={ph}
+                className="mt-1.5 h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/40"
+              />
+            </label>
+          ))}
+          <label className="block text-xs">
+            <span className="text-muted-foreground">Tipo</span>
+            <select className="mt-1.5 h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/40">
+              {["Lead", "Cliente", "Usuário", "Parceiro", "Decisor"].map((t) => (
+                <option key={t}>{t}</option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-xs">
+            <span className="text-muted-foreground">Responsável</span>
+            <select className="mt-1.5 h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/40">
+              {["Marina Souza", "Rafael Lima", "Camila Reis", "Ana Prado"].map((t) => (
+                <option key={t}>{t}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+      </Modal>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,380px)_1fr]">
         <Panel className="p-0 sm:p-0">

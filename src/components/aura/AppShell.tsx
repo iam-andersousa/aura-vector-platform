@@ -5,15 +5,18 @@ import {
   ChevronLeft,
   FileBarChart,
   Gauge,
+  HelpCircle,
   KanbanSquare,
   LayoutGrid,
   LifeBuoy,
+  LogOut,
   Megaphone,
   Menu,
   Moon,
   Plug,
   Plus,
   Route as RouteIcon,
+  Rocket,
   Search,
   Settings,
   Sun,
@@ -21,12 +24,13 @@ import {
   Workflow,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import logoDark from "@/assets/aura-logo-dark.png.asset.json";
 import logoLight from "@/assets/aura-logo-light.png.asset.json";
 import markDark from "@/assets/aura-mark-dark.png.asset.json";
 import markWhite from "@/assets/aura-mark-white.png.asset.json";
+import profilePic from "@/assets/profile-user.png.asset.json";
 import { useTheme } from "@/components/aura/theme";
 import { cn } from "@/lib/utils";
 
@@ -52,7 +56,7 @@ function Logo({ collapsed }: { collapsed: boolean }) {
       <img
         src={theme === "dark" ? markWhite.url : markDark.url}
         alt="Aura Vector"
-        className="h-7 w-7"
+        className="h-11 w-11"
       />
     );
   }
@@ -60,8 +64,76 @@ function Logo({ collapsed }: { collapsed: boolean }) {
     <img
       src={theme === "dark" ? logoLight.url : logoDark.url}
       alt="Aura Vector"
-      className="h-6 w-auto"
+      className="h-11 w-auto"
     />
+  );
+}
+
+function UserMenu() {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [open]);
+
+  const items = [
+    { label: "Configurações", icon: Settings, to: "/configuracoes" },
+    { label: "Fazer upgrade", icon: Rocket },
+    { label: "Ajuda & suporte", icon: HelpCircle },
+    { label: "Sair", icon: LogOut },
+  ] as const;
+
+  return (
+    <div className="relative pl-1" ref={ref}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className="flex items-center gap-2 rounded-full p-0.5 transition-colors hover:bg-muted"
+      >
+        <img
+          src={profilePic.url}
+          alt="Marina Souza"
+          className="h-9 w-9 rounded-full object-cover"
+        />
+        <div className="hidden pr-1 text-left leading-tight xl:block">
+          <p className="text-xs font-medium">Marina Souza</p>
+          <p className="text-[11px] text-muted-foreground">Head de RevOps</p>
+        </div>
+      </button>
+      {open ? (
+        <div className="surface absolute right-0 top-[calc(100%+10px)] z-50 w-56 overflow-hidden p-1.5 shadow-xl">
+          {items.map((item) =>
+            "to" in item && item.to ? (
+              <Link
+                key={item.label}
+                to={item.to}
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <item.icon className="h-4 w-4" />
+                {item.label}
+              </Link>
+            ) : (
+              <button
+                key={item.label}
+                onClick={() => setOpen(false)}
+                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <item.icon className="h-4 w-4" />
+                {item.label}
+              </button>
+            ),
+          )}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -106,15 +178,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         ) : null}
-        <button
-          onClick={() => setCollapsed((c) => !c)}
-          className="mt-3 hidden w-full items-center justify-center gap-2 rounded-xl border border-border py-2 text-xs text-muted-foreground transition-colors hover:text-foreground lg:flex"
-        >
-          <ChevronLeft
-            className={cn("h-3.5 w-3.5 transition-transform", collapsed && "rotate-180")}
-          />
-          {!collapsed ? "Recolher" : null}
-        </button>
       </div>
     </nav>
   );
@@ -130,7 +193,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           >
             <Menu className="h-4 w-4" />
           </button>
-          <Link to="/" className="hidden lg:flex" style={{ width: collapsed ? 44 : 232 }}>
+          <Link
+            to="/"
+            className="hidden items-center lg:flex"
+            style={{ width: collapsed ? 52 : 232 }}
+          >
             <Logo collapsed={collapsed} />
           </Link>
           <div className="lg:hidden">
@@ -168,15 +235,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Nova ação</span>
             </button>
-            <div className="flex items-center gap-2 pl-1">
-              <span className="gradient-aura flex h-9 w-9 items-center justify-center rounded-full text-xs font-medium text-white">
-                MS
-              </span>
-              <div className="hidden leading-tight xl:block">
-                <p className="text-xs font-medium">Marina Souza</p>
-                <p className="text-[11px] text-muted-foreground">Head de RevOps</p>
-              </div>
-            </div>
+            <UserMenu />
           </div>
         </div>
       </header>
@@ -187,6 +246,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           style={{ width: collapsed ? 76 : 260 }}
         >
           {sidebar}
+          <button
+            onClick={() => setCollapsed((c) => !c)}
+            aria-label={collapsed ? "Expandir barra lateral" : "Recolher barra lateral"}
+            className="absolute -right-3.5 top-1/2 z-30 hidden h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-sm transition-colors hover:border-primary hover:text-primary lg:flex"
+          >
+            <ChevronLeft
+              className={cn("h-3.5 w-3.5 transition-transform", collapsed && "rotate-180")}
+            />
+          </button>
         </aside>
 
         {mobileOpen ? (

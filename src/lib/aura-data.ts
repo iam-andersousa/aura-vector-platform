@@ -1,12 +1,12 @@
 export const kpis = [
-  { label: "Receita influenciada", value: "R$ 4,82M", delta: "+12,4%", up: true, hint: "últimos 90 dias" },
-  { label: "Leads ativos", value: "1.284", delta: "+8,1%", up: true, hint: "em jornada" },
-  { label: "Oportunidades abertas", value: "216", delta: "+3,6%", up: true, hint: "R$ 9,1M em pipeline" },
-  { label: "Clientes em risco", value: "7", delta: "+2", up: false, hint: "health score < 60" },
-  { label: "Tickets críticos", value: "13", delta: "-4", up: true, hint: "SLA em risco: 3" },
-  { label: "Health score médio", value: "78", delta: "+1,9", up: true, hint: "base ativa" },
-  { label: "Speed to Lead", value: "6m 12s", delta: "-1m 40s", up: true, hint: "meta: 5 min" },
-  { label: "Show-up rate", value: "72%", delta: "+4,2%", up: true, hint: "reuniões agendadas" },
+  { label: "Receita influenciada", value: "R$ 4,82M", delta: "+12,4%", up: true, hint: "últimos 90 dias", accent: "sales" as const, area: "Vendas", trend: [312, 348, 402, 388, 452, 498, 540] },
+  { label: "Leads ativos", value: "1.284", delta: "+8,1%", up: true, hint: "em jornada", accent: "mkt" as const, area: "Marketing", trend: [820, 902, 968, 1024, 1102, 1188, 1284] },
+  { label: "Oportunidades abertas", value: "216", delta: "+3,6%", up: true, hint: "R$ 9,1M em pipeline", accent: "sales" as const, area: "Vendas", trend: [168, 178, 192, 186, 201, 208, 216] },
+  { label: "Clientes em risco", value: "7", delta: "+2", up: false, hint: "health score < 60", accent: "cs" as const, area: "Apoio ao Cliente", trend: [3, 4, 4, 5, 5, 6, 7] },
+  { label: "Tickets críticos", value: "13", delta: "-4", up: true, hint: "SLA em risco: 3", accent: "cs" as const, area: "Apoio ao Cliente", trend: [24, 22, 19, 21, 17, 15, 13] },
+  { label: "Health score médio", value: "78", delta: "+1,9", up: true, hint: "base ativa", accent: "cs" as const, area: "Apoio ao Cliente", trend: [71, 72, 74, 73, 76, 77, 78] },
+  { label: "Speed to Lead", value: "6m 12s", delta: "-1m 40s", up: true, hint: "meta: 5 min", accent: "sales" as const, area: "Vendas", trend: [11, 10, 9, 8.5, 7.6, 6.8, 6.2] },
+  { label: "Show-up rate", value: "72%", delta: "+4,2%", up: true, hint: "reuniões agendadas", accent: "mkt" as const, area: "Marketing", trend: [58, 61, 63, 66, 68, 70, 72] },
 ];
 
 export const funnel = [

@@ -7,7 +7,7 @@ import {
   PageHeader,
   Panel,
   ProgressBar,
-  RoundedBars,
+  Donut,
   SectionTitle,
   StatCard,
 } from "@/components/aura/ui";
@@ -57,9 +57,9 @@ function MarketingPage() {
           <SectionTitle action={<Chip tone="mkt">Leads por canal</Chip>}>
             Canais de aquisição
           </SectionTitle>
-          <RoundedBars
-            data={campaigns.map((c) => ({ label: c.channel.split(" ")[0]!, value: c.leads }))}
-            color="var(--mkt)"
+          <Donut
+            centerLabel="leads"
+            data={campaigns.map((c) => ({ label: c.channel, value: c.leads }))}
           />
         </Panel>
         <Panel>

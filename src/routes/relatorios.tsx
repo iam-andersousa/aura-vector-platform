@@ -6,7 +6,7 @@ import {
   PageHeader,
   Panel,
   ProgressBar,
-  RoundedBars,
+  Donut,
   SectionTitle,
   TrendArea,
 } from "@/components/aura/ui";
@@ -58,13 +58,14 @@ function RelatoriosPage() {
           <SectionTitle action={<Chip tone="sales">R$ mil</Chip>}>
             Receita por canal
           </SectionTitle>
-          <RoundedBars
+          <Donut
+            centerLabel="R$ mil"
             data={[
-              { label: "LinkedIn", value: 1420 },
-              { label: "Google", value: 1180 },
+              { label: "LinkedIn Ads", value: 1420 },
+              { label: "Google Ads", value: 1180 },
               { label: "Orgânico", value: 540 },
-              { label: "Meta", value: 320 },
-              { label: "RD", value: 260 },
+              { label: "Meta Ads", value: 320 },
+              { label: "RD Station", value: 260 },
             ]}
           />
         </Panel>
@@ -110,15 +111,15 @@ function RelatoriosPage() {
         </Panel>
         <Panel>
           <SectionTitle>Produtividade por time</SectionTitle>
-          <RoundedBars
+          <Donut
+            centerLabel="atividades"
+            height={220}
             data={[
               { label: "Marketing", value: 312 },
               { label: "SDR", value: 486 },
               { label: "Closers", value: 274 },
               { label: "CS", value: 358 },
             ]}
-            color="var(--cs)"
-            height={200}
           />
         </Panel>
       </section>

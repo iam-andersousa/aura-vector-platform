@@ -2,8 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Filter, Search } from "lucide-react";
 import { useState } from "react";
 
-import { AiBadge, Chip, PageHeader } from "@/components/aura/ui";
-import { kanbanCards, kanbanColumns } from "@/lib/aura-data";
+import {
+  AiBadge,
+  Chip,
+  HealthDots,
+  Modal,
+  PageHeader,
+  ProgressBar,
+} from "@/components/aura/ui";
+import { kanbanCards, kanbanColumns, type Stakeholder } from "@/lib/aura-data";
 
 export const Route = createFileRoute("/kanban")({
   head: () => ({
@@ -38,6 +45,29 @@ const prioTone: Record<string, "danger" | "warning" | "neutral"> = {
 
 function KanbanPage() {
   const [query, setQuery] = useState("");
+  const [board, setBoard] = useState<Record<string, Stakeholder[]>>(() =>
+    Object.fromEntries(
+      kanbanColumns.map((c) => [c.title, [...(kanbanCards[c.title] ?? [])]]),
+    ),
+  );
+  const [dragging, setDragging] = useState<{ from: string; id: string } | null>(null);
+  const [overCol, setOverCol] = useState<string | null>(null);
+  const [active, setActive] = useState<Stakeholder | null>(null);
+
+  const drop = (to: string) => {
+    setOverCol(null);
+    if (!dragging || dragging.from === to) return setDragging(null);
+    setBoard((prev) => {
+      const card = prev[dragging.from]?.find((c) => c.id === dragging.id);
+      if (!card) return prev;
+      return {
+        ...prev,
+        [dragging.from]: (prev[dragging.from] ?? []).filter((c) => c.id !== dragging.id),
+        [to]: [{ ...card, status: to }, ...(prev[to] ?? [])],
+      };
+    });
+    setDragging(null);
+  };
 
   return (
     <>
@@ -63,11 +93,20 @@ function KanbanPage() {
 
       <div className="flex gap-4 overflow-x-auto pb-4">
         {kanbanColumns.map((col) => {
-          const cards = (kanbanCards[col.title] ?? []).filter((c) =>
+          const cards = (board[col.title] ?? []).filter((c) =>
             (c.name + c.company).toLowerCase().includes(query.toLowerCase()),
           );
           return (
-            <div key={col.title} className="w-[280px] shrink-0">
+            <div
+              key={col.title}
+              className="w-[280px] shrink-0"
+              onDragOver={(e) => {
+                e.preventDefault();
+                setOverCol(col.title);
+              }}
+              onDragLeave={() => setOverCol((c) => (c === col.title ? null : c))}
+              onDrop={() => drop(col.title)}
+            >
               <div className="mb-3 flex items-center gap-2">
                 <span className={`h-2 w-2 rounded-full ${accentBar[col.accent]}`} />
                 <p className="text-xs font-medium uppercase tracking-[0.14em]">
@@ -77,11 +116,23 @@ function KanbanPage() {
                   {cards.length}
                 </span>
               </div>
-              <div className="space-y-3 rounded-2xl bg-muted/40 p-2">
+              <div
+                className={`min-h-[120px] space-y-3 rounded-2xl border border-dashed p-2 transition-colors ${
+                  overCol === col.title
+                    ? "border-primary bg-primary/5"
+                    : "border-transparent bg-muted/40"
+                }`}
+              >
                 {cards.map((c) => (
                   <article
                     key={c.id}
-                    className="surface cursor-grab p-4 transition-transform hover:-translate-y-0.5"
+                    draggable
+                    onDragStart={() => setDragging({ from: col.title, id: c.id })}
+                    onDragEnd={() => setDragging(null)}
+                    onClick={() => setActive(c)}
+                    className={`surface cursor-grab p-4 transition-transform hover:-translate-y-0.5 active:cursor-grabbing ${
+                      dragging?.id === c.id ? "opacity-40" : ""
+                    }`}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div>
@@ -118,6 +169,63 @@ function KanbanPage() {
           );
         })}
       </div>
+
+      <Modal
+        open={active !== null}
+        onClose={() => setActive(null)}
+        title={active?.name ?? ""}
+        subtitle={active ? `${active.company} · ${active.status}` : undefined}
+        footer={
+          <>
+            <button
+              onClick={() => setActive(null)}
+              className="rounded-xl border border-border px-3.5 py-2 text-sm text-muted-foreground hover:text-foreground"
+            >
+              Fechar
+            </button>
+            <button className="rounded-xl bg-primary px-3.5 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">
+              Registrar interação
+            </button>
+          </>
+        }
+      >
+        {active ? (
+          <div className="space-y-5">
+            <div className="flex flex-wrap gap-2">
+              <Chip tone={prioTone[active.priority] ?? "neutral"}>
+                Prioridade {active.priority}
+              </Chip>
+              <Chip tone="sales">{active.value}</Chip>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                ["Origem", active.origin],
+                ["Jornada", active.journey],
+                ["Responsável", active.owner],
+                ["Última interação", active.lastTouch],
+              ].map(([k, v]) => (
+                <div key={k} className="rounded-xl bg-muted/60 p-3">
+                  <p className="text-[11px] text-muted-foreground">{k}</p>
+                  <p className="mt-1 text-sm font-medium">{v}</p>
+                </div>
+              ))}
+            </div>
+            <div>
+              <p className="eyebrow">Saúde do relacionamento</p>
+              <div className="mt-3 space-y-3">
+                <HealthDots value={active.health} />
+                <ProgressBar value={active.health} />
+              </div>
+            </div>
+            {active.ai ? (
+              <div className="rounded-2xl bg-muted/60 p-4">
+                <AiBadge>Vector</AiBadge>
+                <p className="mt-2 text-sm text-muted-foreground">{active.ai}</p>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+      </Modal>
     </>
   );
 }

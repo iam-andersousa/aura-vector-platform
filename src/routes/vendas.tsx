@@ -8,7 +8,7 @@ import {
   PageHeader,
   Panel,
   ProgressBar,
-  RoundedBars,
+  Donut,
   SectionTitle,
   StatCard,
   TrendArea,
@@ -73,7 +73,7 @@ function VendasPage() {
           <SectionTitle action={<Chip tone="sales">R$ mil</Chip>}>
             Pipeline comercial por etapa
           </SectionTitle>
-          <RoundedBars data={pipeline} />
+          <Donut data={pipeline} centerLabel="R$ mil" />
         </Panel>
         <Panel>
           <SectionTitle>Previsão de receita</SectionTitle>
