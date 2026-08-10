@@ -56,7 +56,7 @@ function Logo({ collapsed }: { collapsed: boolean }) {
       <img
         src={theme === "dark" ? markWhite.url : markDark.url}
         alt="Aura Vector"
-        className="h-10 w-10"
+        className="h-11 w-11"
       />
     );
   }
@@ -64,7 +64,7 @@ function Logo({ collapsed }: { collapsed: boolean }) {
     <img
       src={theme === "dark" ? logoLight.url : logoDark.url}
       alt="Aura Vector"
-      className="h-10 w-auto"
+      className="h-11 w-auto"
     />
   );
 }
