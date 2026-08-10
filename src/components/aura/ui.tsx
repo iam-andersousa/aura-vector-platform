@@ -1,4 +1,4 @@
-import { ArrowDownRight, ArrowUpRight, Sparkles } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Sparkles, X } from "lucide-react";
 import {
   Area,
   AreaChart,
@@ -6,12 +6,18 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 
+import aiBg from "@/assets/ai-bg.png.asset.json";
 import { cn } from "@/lib/utils";
 
 export function PageHeader({
@@ -71,6 +77,7 @@ export function StatCard({
   up,
   hint,
   accent,
+  trend,
 }: {
   label: string;
   value: string;
@@ -78,7 +85,10 @@ export function StatCard({
   up?: boolean;
   hint?: string;
   accent?: "mkt" | "sales" | "cs";
+  trend?: number[];
 }) {
+  const toneVar =
+    accent === "mkt" ? "var(--mkt)" : accent === "cs" ? "var(--cs)" : "var(--sales)";
   return (
     <div className="surface p-5">
       <div className="flex items-start justify-between gap-3">
@@ -108,6 +118,120 @@ export function StatCard({
         ) : null}
         {hint ? <span className="text-muted-foreground">{hint}</span> : null}
       </div>
+      {trend ? (
+        <div className="mt-3">
+          <Sparkline data={trend} color={toneVar} />
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+export function Sparkline({
+  data,
+  color = "var(--sales)",
+  height = 34,
+}: {
+  data: number[];
+  color?: string;
+  height?: number;
+}) {
+  const points = data.map((value, i) => ({ i, value }));
+  return (
+    <div style={{ height }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={points} margin={{ top: 4, right: 2, left: 2, bottom: 0 }}>
+          <Line
+            type="monotone"
+            dataKey="value"
+            stroke={color}
+            strokeWidth={2}
+            dot={false}
+            isAnimationActive={false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+export function Modal({
+  open,
+  onClose,
+  title,
+  subtitle,
+  children,
+  footer,
+}: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
+  footer?: React.ReactNode;
+}) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-foreground/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="surface relative z-10 max-h-[85vh] w-full max-w-lg overflow-y-auto p-6 shadow-2xl">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h3 className="text-xl font-display">{title}</h3>
+            {subtitle ? (
+              <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>
+            ) : null}
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="Fechar"
+            className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="mt-5">{children}</div>
+        {footer ? <div className="mt-6 flex justify-end gap-2">{footer}</div> : null}
+      </div>
+    </div>
+  );
+}
+
+export function SegmentedFilter({
+  options,
+  value,
+  onChange,
+  className,
+}: {
+  options: readonly string[];
+  value: string;
+  onChange: (v: string) => void;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "inline-flex items-center gap-1 rounded-xl border border-border bg-card p-1",
+        className,
+      )}
+    >
+      {options.map((o) => (
+        <button
+          key={o}
+          onClick={() => onChange(o)}
+          className={cn(
+            "rounded-lg px-2.5 py-1.5 text-xs transition-colors",
+            value === o
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          {o}
+        </button>
+      ))}
     </div>
   );
 }
