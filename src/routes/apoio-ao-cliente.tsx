@@ -61,6 +61,7 @@ function ApoioPage() {
         subtitle="CS, CX, suporte, atendimento e onboarding operando com o mesmo contexto de vendas e marketing."
       >
         <Chip tone="cs">132 clientes ativos</Chip>
+        {filters}
       </PageHeader>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

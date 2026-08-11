@@ -63,6 +63,7 @@ function RelatoriosPage() {
           <Download className="h-4 w-4" />
           Exportar tudo
         </button>
+        {filters}
       </PageHeader>
 
       <section className="grid gap-4 lg:grid-cols-3">

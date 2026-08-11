@@ -71,6 +71,7 @@ function VendasPage() {
         subtitle="Cada oportunidade traz origem, histórico e o próximo passo recomendado."
       >
         <Chip tone="sales">216 oportunidades abertas</Chip>
+        {filters}
       </PageHeader>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

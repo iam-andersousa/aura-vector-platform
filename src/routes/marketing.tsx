@@ -55,6 +55,7 @@ function MarketingPage() {
         <Chip tone="mkt">
           <span className="h-2 w-2 rounded-full bg-mkt" /> 5 campanhas ativas
         </Chip>
+        {filters}
       </PageHeader>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
