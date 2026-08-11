@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { AlertOctagon } from "lucide-react";
 
 import {
@@ -6,6 +7,7 @@ import {
   Chip,
   Gauge,
   HealthDots,
+  AnalyticsFilters,
   PageHeader,
   Panel,
   ProgressBar,
@@ -41,6 +43,16 @@ const riskTone: Record<string, "danger" | "warning" | "success"> = {
 };
 
 function ApoioPage() {
+  const [period, setPeriod] = useState<string>("Este mês");
+  const [sector, setSector] = useState<string>("Todos");
+  const filters = (
+    <AnalyticsFilters
+      period={period}
+      onPeriod={setPeriod}
+      sector={sector}
+      onSector={setSector}
+    />
+  );
   return (
     <>
       <PageHeader

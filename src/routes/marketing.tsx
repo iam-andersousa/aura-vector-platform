@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 
 import {
   AiCard,
   Chip,
   Heatmap,
+  AnalyticsFilters,
   PageHeader,
   Panel,
   ProgressBar,
@@ -33,6 +35,16 @@ export const Route = createFileRoute("/marketing")({
 });
 
 function MarketingPage() {
+  const [period, setPeriod] = useState<string>("Este mês");
+  const [sector, setSector] = useState<string>("Todos");
+  const filters = (
+    <AnalyticsFilters
+      period={period}
+      onPeriod={setPeriod}
+      sector={sector}
+      onSector={setSector}
+    />
+  );
   return (
     <>
       <PageHeader
@@ -54,7 +66,7 @@ function MarketingPage() {
 
       <section className="grid gap-4 lg:grid-cols-3">
         <Panel className="lg:col-span-2">
-          <SectionTitle action={<Chip tone="mkt">Leads por canal</Chip>}>
+          <SectionTitle action={filters}>
             Canais de aquisição
           </SectionTitle>
           <Donut

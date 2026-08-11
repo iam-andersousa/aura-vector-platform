@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { PhoneCall } from "lucide-react";
 
 import {
   AiCard,
   Chip,
   Gauge,
+  AnalyticsFilters,
   PageHeader,
   Panel,
   ProgressBar,
@@ -51,6 +53,16 @@ const forecast = [
 ];
 
 function VendasPage() {
+  const [period, setPeriod] = useState<string>("Este mês");
+  const [sector, setSector] = useState<string>("Todos");
+  const filters = (
+    <AnalyticsFilters
+      period={period}
+      onPeriod={setPeriod}
+      sector={sector}
+      onSector={setSector}
+    />
+  );
   return (
     <>
       <PageHeader
@@ -70,7 +82,7 @@ function VendasPage() {
 
       <section className="grid gap-4 lg:grid-cols-3">
         <Panel className="lg:col-span-2">
-          <SectionTitle action={<Chip tone="sales">R$ mil</Chip>}>
+          <SectionTitle action={filters}>
             Pipeline comercial por etapa
           </SectionTitle>
           <Donut data={pipeline} centerLabel="R$ mil" />
