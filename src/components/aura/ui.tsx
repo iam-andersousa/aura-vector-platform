@@ -449,7 +449,7 @@ function useOutside(onClose: () => void) {
 }
 
 const iconTrigger =
-  "inline-flex items-center gap-2 rounded-xl bg-muted px-2.5 py-2 text-xs text-muted-foreground transition-colors hover:text-foreground";
+  "inline-flex items-center gap-2 whitespace-nowrap rounded-xl bg-muted px-2.5 py-2 text-xs text-muted-foreground transition-colors hover:text-foreground";
 
 export const datePresets = [
   "Esta semana",
@@ -609,7 +609,7 @@ export function AnalyticsFilters({
   className?: string;
 }) {
   return (
-    <div className={cn("flex items-center gap-1.5", className)}>
+    <div className={cn("flex shrink-0 items-center gap-1.5", className)}>
       <DateFilter value={period} onChange={onPeriod} />
       <CategoryFilter value={sector} onChange={onSector} />
     </div>
