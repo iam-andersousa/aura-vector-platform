@@ -1,4 +1,12 @@
-import { ArrowDownRight, ArrowUpRight, Sparkles, X } from "lucide-react";
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  CalendarDays,
+  Check,
+  Tag,
+  X,
+} from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
 import {
   Area,
   AreaChart,
@@ -17,8 +25,19 @@ import {
   YAxis,
 } from "recharts";
 
-import aiBg from "@/assets/ai-bg.png.asset.json";
+import aiBg from "@/assets/ai-gradient-bg.png.asset.json";
 import { cn } from "@/lib/utils";
+
+export function StarMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden className={cn("h-4 w-4", className)}>
+      <path
+        fill="currentColor"
+        d="M12 0c.7 4.6 2.9 7.6 7.3 8.9L24 12l-4.7 3.1C14.9 16.4 12.7 19.4 12 24c-.7-4.6-2.9-7.6-7.3-8.9L0 12l4.7-3.1C9.1 7.6 11.3 4.6 12 0Z"
+      />
+    </svg>
+  );
+}
 
 export function PageHeader({
   eyebrow,
@@ -87,43 +106,77 @@ export function StatCard({
   accent?: "mkt" | "sales" | "cs";
   trend?: number[];
 }) {
-  const toneVar =
-    accent === "mkt" ? "var(--mkt)" : accent === "cs" ? "var(--cs)" : "var(--sales)";
   return (
-    <div className="surface p-5">
-      <div className="flex items-start justify-between gap-3">
-        <p className="text-xs font-medium tracking-wide text-muted-foreground">
-          {label}
-        </p>
-        {accent ? <Dot accent={accent} /> : null}
-      </div>
-      <p className="mt-3 text-2xl font-display tracking-tight">{value}</p>
-      <div className="mt-2 flex items-center gap-2 text-xs">
-        {delta ? (
-          <span
-            className={cn(
-              "inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium",
-              up
-                ? "bg-success/10 text-success"
-                : "bg-destructive/10 text-destructive",
-            )}
-          >
-            {up ? (
-              <ArrowUpRight className="h-3 w-3" />
-            ) : (
-              <ArrowDownRight className="h-3 w-3" />
-            )}
-            {delta}
-          </span>
-        ) : null}
-        {hint ? <span className="text-muted-foreground">{hint}</span> : null}
-      </div>
+    <div className="surface relative overflow-hidden p-5">
       {trend ? (
-        <div className="mt-3">
-          <Sparkline data={trend} color={toneVar} />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-[62%]">
+          <MiniTrend data={trend} up={up !== false} />
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, var(--color-card) 22%, color-mix(in oklab, var(--color-card) 55%, transparent) 62%, transparent 100%)",
+            }}
+          />
         </div>
       ) : null}
+      <div className="relative">
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-xs font-medium tracking-wide text-muted-foreground">
+            {label}
+          </p>
+          {accent ? <Dot accent={accent} /> : null}
+        </div>
+        <p className="mt-3 text-2xl font-display font-bold tracking-tight">{value}</p>
+        <div className="mt-2 flex items-center gap-2 text-xs">
+          {delta ? (
+            <span
+              className={cn(
+                "inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-bold",
+                up
+                  ? "bg-success/10 text-success"
+                  : "bg-destructive/10 text-destructive",
+              )}
+            >
+              {up ? (
+                <ArrowUpRight className="h-3 w-3" />
+              ) : (
+                <ArrowDownRight className="h-3 w-3" />
+              )}
+              {delta}
+            </span>
+          ) : null}
+          {hint ? <span className="text-muted-foreground">{hint}</span> : null}
+        </div>
+      </div>
     </div>
+  );
+}
+
+export function MiniTrend({ data, up = true }: { data: number[]; up?: boolean }) {
+  const gid = useId().replace(/:/g, "");
+  const color = up ? "var(--success)" : "var(--destructive)";
+  const points = data.map((value, i) => ({ i, value }));
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <AreaChart data={points} margin={{ top: 18, right: 0, left: 0, bottom: 0 }}>
+        <defs>
+          <linearGradient id={`mini-${gid}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={color} stopOpacity={0.35} />
+            <stop offset="100%" stopColor={color} stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <Area
+          type="monotone"
+          dataKey="value"
+          stroke={color}
+          strokeWidth={2}
+          fill={`url(#mini-${gid})`}
+          isAnimationActive={false}
+          dot={false}
+        />
+      </AreaChart>
+    </ResponsiveContainer>
   );
 }
 
@@ -292,50 +345,274 @@ export function AiCard({
   body,
   tag,
   className,
+  items,
 }: {
   title: string;
   body: string;
   tag?: string;
   className?: string;
+  items?: string[];
 }) {
+  const [open, setOpen] = useState(false);
+  const list = items ?? [
+    "Revisar contexto completo do indicador",
+    "Acionar o responsável pela área",
+    "Registrar decisão na jornada do stakeholder",
+  ];
   return (
-    <div
-      className={cn(
-        "gradient-aura rounded-2xl p-[1.5px] shadow-sm transition-transform hover:-translate-y-0.5",
-        className,
-      )}
-    >
-      <div className="relative h-full overflow-hidden rounded-[calc(var(--radius-xl)-1px)] bg-card">
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className={cn(
+          "group relative h-full overflow-hidden rounded-2xl text-left transition-transform hover:-translate-y-0.5",
+          className,
+        )}
+      >
         <img
           src={aiBg.url}
           alt=""
           aria-hidden
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
         />
-        <div className="pointer-events-none absolute inset-0 bg-card/78 backdrop-blur-[2px]" />
-        <div className="relative p-5">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "linear-gradient(180deg, oklch(0.16 0.03 265 / 25%) 0%, oklch(0.14 0.03 265 / 72%) 55%, oklch(0.12 0.02 265 / 92%) 100%)",
+          }}
+        />
+        <div className="relative flex h-full flex-col p-5">
           <div className="flex items-center justify-between gap-3">
-            <span className="gradient-aura inline-flex h-7 w-7 items-center justify-center rounded-full">
-              <Sparkles className="h-3.5 w-3.5 text-white" />
+            <span className="text-white">
+              <StarMark className="h-5 w-5" />
             </span>
-            {tag ? <Chip>{tag}</Chip> : null}
+            {tag ? (
+              <span className="rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur">
+                {tag}
+              </span>
+            ) : null}
           </div>
-          <p className="mt-4 text-sm font-display leading-snug">{title}</p>
-          <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-            {body}
+          <p className="mt-8 text-sm font-display font-bold leading-snug text-white">
+            {title}
           </p>
+          <p className="mt-2 text-xs leading-relaxed text-white/75">{body}</p>
+          <span className="mt-4 text-[11px] font-medium text-white/70 group-hover:text-white">
+            Ver recomendações →
+          </span>
         </div>
-      </div>
-    </div>
+      </button>
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        title={title}
+        subtitle={tag ? `Vector · ${tag}` : "Vector"}
+      >
+        <p className="text-sm leading-relaxed text-muted-foreground">{body}</p>
+        <p className="eyebrow mt-6">Recomendações e insights</p>
+        <ul className="mt-3 space-y-2.5">
+          {list.map((i) => (
+            <li
+              key={i}
+              className="flex items-start gap-3 rounded-xl bg-muted/60 px-3.5 py-3 text-sm"
+            >
+              <span className="mt-0.5 text-primary">
+                <StarMark className="h-3.5 w-3.5" />
+              </span>
+              <span>{i}</span>
+            </li>
+          ))}
+        </ul>
+      </Modal>
+    </>
   );
 }
 
 export function AiBadge({ children }: { children: React.ReactNode }) {
   return (
     <span className="gradient-aura inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium text-white">
-      <Sparkles className="h-2.5 w-2.5" />
+      <StarMark className="h-2.5 w-2.5" />
       {children}
     </span>
+  );
+}
+
+function useOutside(onClose: () => void) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [onClose]);
+  return ref;
+}
+
+const iconTrigger =
+  "inline-flex items-center gap-2 rounded-xl bg-muted px-2.5 py-2 text-xs text-muted-foreground transition-colors hover:text-foreground";
+
+export const datePresets = [
+  "Esta semana",
+  "Este mês",
+  "Este ano",
+  "Período personalizado",
+] as const;
+
+export function DateFilter({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [custom, setCustom] = useState(false);
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const ref = useOutside(() => {
+    setOpen(false);
+    setCustom(false);
+  });
+
+  return (
+    <div className="relative" ref={ref}>
+      <button onClick={() => setOpen((o) => !o)} className={iconTrigger}>
+        <CalendarDays className="h-4 w-4" />
+        <span className="hidden sm:inline">{value}</span>
+      </button>
+      {open ? (
+        <div className="surface absolute right-0 top-[calc(100%+8px)] z-50 w-64 p-1.5 shadow-xl">
+          {datePresets.map((p) => (
+            <button
+              key={p}
+              onClick={() => {
+                if (p === "Período personalizado") {
+                  setCustom(true);
+                  return;
+                }
+                onChange(p);
+                setCustom(false);
+                setOpen(false);
+              }}
+              className={cn(
+                "flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs transition-colors hover:bg-muted",
+                value === p ? "text-primary" : "text-muted-foreground",
+              )}
+            >
+              {p}
+              {value === p ? <Check className="h-3.5 w-3.5" /> : null}
+            </button>
+          ))}
+          {custom ? (
+            <div className="mt-1 space-y-2 rounded-lg bg-muted/60 p-3">
+              <label className="block text-[11px] text-muted-foreground">
+                De
+                <input
+                  type="date"
+                  value={from}
+                  onChange={(e) => setFrom(e.target.value)}
+                  className="mt-1 h-9 w-full rounded-lg bg-card px-2.5 text-xs outline-none focus:ring-2 focus:ring-ring/40"
+                />
+              </label>
+              <label className="block text-[11px] text-muted-foreground">
+                Até
+                <input
+                  type="date"
+                  value={to}
+                  onChange={(e) => setTo(e.target.value)}
+                  className="mt-1 h-9 w-full rounded-lg bg-card px-2.5 text-xs outline-none focus:ring-2 focus:ring-ring/40"
+                />
+              </label>
+              <button
+                disabled={!from || !to}
+                onClick={() => {
+                  onChange(
+                    `${from.split("-").reverse().join("/")} – ${to
+                      .split("-")
+                      .reverse()
+                      .join("/")}`,
+                  );
+                  setOpen(false);
+                  setCustom(false);
+                }}
+                className="w-full rounded-lg bg-primary py-2 text-xs font-medium text-primary-foreground disabled:opacity-50"
+              >
+                Aplicar intervalo
+              </button>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+export const sectorOptions = [
+  "Todos",
+  "Marketing",
+  "Vendas",
+  "Apoio ao Cliente",
+] as const;
+
+export function CategoryFilter({
+  value,
+  onChange,
+  options = sectorOptions,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options?: readonly string[];
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useOutside(() => setOpen(false));
+  return (
+    <div className="relative" ref={ref}>
+      <button onClick={() => setOpen((o) => !o)} className={iconTrigger}>
+        <Tag className="h-4 w-4" />
+        <span className="hidden sm:inline">{value}</span>
+      </button>
+      {open ? (
+        <div className="surface absolute right-0 top-[calc(100%+8px)] z-50 w-52 p-1.5 shadow-xl">
+          {options.map((o) => (
+            <button
+              key={o}
+              onClick={() => {
+                onChange(o);
+                setOpen(false);
+              }}
+              className={cn(
+                "flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs transition-colors hover:bg-muted",
+                value === o ? "text-primary" : "text-muted-foreground",
+              )}
+            >
+              {o}
+              {value === o ? <Check className="h-3.5 w-3.5" /> : null}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+export function AnalyticsFilters({
+  period,
+  onPeriod,
+  sector,
+  onSector,
+  className,
+}: {
+  period: string;
+  onPeriod: (v: string) => void;
+  sector: string;
+  onSector: (v: string) => void;
+  className?: string;
+}) {
+  return (
+    <div className={cn("flex items-center gap-1.5", className)}>
+      <DateFilter value={period} onChange={onPeriod} />
+      <CategoryFilter value={sector} onChange={onSector} />
+    </div>
   );
 }
 

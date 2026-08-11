@@ -24,21 +24,41 @@ export const aiInsights = [
     title: "Queda na qualidade dos leads pagos",
     body: "Leads de campanhas pagas caíram 18% em score médio nas últimas 2 semanas. Revise segmentação de Meta Ads.",
     tag: "Marketing",
+    actions: [
+      "Pausar públicos frios de Meta Ads com score abaixo de 45",
+      "Revisar criativos da campanha de retargeting",
+      "Realocar 15% do budget para LinkedIn Ads",
+    ],
   },
   {
     title: "3 clientes com risco de churn",
     body: "Nova Lima Tech, Grupo Vertex e Orbita Log combinam queda de uso e tickets recorrentes.",
     tag: "Apoio ao Cliente",
+    actions: [
+      "Agendar QBR de resgate com Nova Lima Tech",
+      "Escalar tickets recorrentes da Orbita Log",
+      "Envolver o sponsor do Grupo Vertex na próxima call",
+    ],
   },
   {
     title: "12 oportunidades precisam de follow-up hoje",
     body: "Negociações paradas há mais de 7 dias somando R$ 1,4M em pipeline.",
     tag: "Vendas",
+    actions: [
+      "Priorizar 4 negociações acima de R$ 200k",
+      "Enviar proposta revisada para o Grupo Vertex",
+      "Criar sequência de follow-up automática no CRM",
+    ],
   },
   {
     title: "LinkedIn e Google Ads lideram receita atribuída",
     body: "68% da receita influenciada no trimestre veio destes dois canais. Sugestão: realocar 15% do budget.",
     tag: "Marketing",
+    actions: [
+      "Aumentar investimento em LinkedIn Ads em 10%",
+      "Duplicar a campanha Front Office Intelligence para novo público",
+      "Reduzir budget de canais com CAC acima da média",
+    ],
   },
 ];
 
