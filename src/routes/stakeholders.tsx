@@ -163,7 +163,10 @@ function StakeholdersPage() {
                 }`}
               >
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-medium">
-                  {s.name.split(" ").map((n) => n[0]).join("")}
+                  {s.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">{s.name}</p>
@@ -175,9 +178,7 @@ function StakeholdersPage() {
               </button>
             ))}
             {filtered.length === 0 ? (
-              <p className="p-6 text-sm text-muted-foreground">
-                Nenhum stakeholder encontrado.
-              </p>
+              <p className="p-6 text-sm text-muted-foreground">Nenhum stakeholder encontrado.</p>
             ) : null}
           </div>
         </Panel>
@@ -187,7 +188,10 @@ function StakeholdersPage() {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="flex items-center gap-4">
                 <span className="gradient-aura flex h-14 w-14 items-center justify-center rounded-2xl text-sm font-medium text-white">
-                  {selected.name.split(" ").map((n) => n[0]).join("")}
+                  {selected.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
                 </span>
                 <div>
                   <h2 className="text-2xl font-display">{selected.name}</h2>
@@ -226,10 +230,17 @@ function StakeholdersPage() {
                   <HealthDots value={selected.health} />
                   <ProgressBar
                     value={selected.health}
-                    tone={selected.health >= 80 ? "success" : selected.health >= 60 ? "warning" : "danger"}
+                    tone={
+                      selected.health >= 80
+                        ? "success"
+                        : selected.health >= 60
+                          ? "warning"
+                          : "danger"
+                    }
                   />
                   <p className="text-xs text-muted-foreground">
-                    Última interação {selected.lastTouch} · prioridade {selected.priority.toLowerCase()}
+                    Última interação {selected.lastTouch} · prioridade{" "}
+                    {selected.priority.toLowerCase()}
                   </p>
                 </div>
               </div>
@@ -240,8 +251,7 @@ function StakeholdersPage() {
                   </span>
                   <p className="mt-3 text-sm font-display">Próximo passo sugerido</p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {selected.ai ??
-                      "Registrar interação e confirmar próximo marco da jornada."}
+                    {selected.ai ?? "Registrar interação e confirmar próximo marco da jornada."}
                   </p>
                 </div>
               </div>

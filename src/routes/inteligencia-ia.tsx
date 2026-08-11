@@ -52,12 +52,11 @@ function IaPage() {
                 <Sparkles className="h-4 w-4 text-white" />
               </span>
               <h2 className="mt-4 text-2xl font-display">
-                <span className="gradient-aura-text">Vector</span> lê o
-                relacionamento inteiro
+                <span className="gradient-aura-text">Vector</span> lê o relacionamento inteiro
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Sinais de campanha, conversas de venda e atendimento se combinam em
-                recomendações claras: o que fazer, com quem e por quê.
+                Sinais de campanha, conversas de venda e atendimento se combinam em recomendações
+                claras: o que fazer, com quem e por quê.
               </p>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
@@ -103,9 +102,9 @@ function IaPage() {
           <SectionTitle>Resumo automático — última call</SectionTitle>
           <div className="rounded-2xl bg-muted/60 p-4 text-sm leading-relaxed">
             <p>
-              Helena Duarte (Grupo Vertex) confirmou budget aprovado para o próximo
-              trimestre. Principal risco: integração com Salesforce legado. Pediu
-              proposta com dois cenários e um case do setor financeiro.
+              Helena Duarte (Grupo Vertex) confirmou budget aprovado para o próximo trimestre.
+              Principal risco: integração com Salesforce legado. Pediu proposta com dois cenários e
+              um case do setor financeiro.
             </p>
           </div>
           <div className="mt-4 space-y-2 text-sm">

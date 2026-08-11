@@ -113,9 +113,7 @@ function UserMenu({ collapsed }: { collapsed?: boolean }) {
           <>
             <div className="min-w-0 flex-1 text-left leading-tight">
               <p className="truncate text-xs font-medium">Marina Souza</p>
-              <p className="truncate text-[11px] text-muted-foreground">
-                Head de RevOps
-              </p>
+              <p className="truncate text-[11px] text-muted-foreground">Head de RevOps</p>
             </div>
             <ChevronUp className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
           </>
@@ -161,26 +159,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const sidebar = (
     <nav className="flex h-full flex-col gap-1 p-3">
       <div className="min-h-0 flex-1 space-y-1 overflow-y-auto">
-      {nav.map((item) => {
-        const active =
-          item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
-        return (
-          <Link
-            key={item.to}
-            to={item.to}
-            onClick={() => setMobileOpen(false)}
-            className={cn(
-              "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors",
-              active
-                ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground",
-            )}
-          >
-            <item.icon className="h-4 w-4 shrink-0" />
-            {!collapsed ? <span className="truncate">{item.label}</span> : null}
-          </Link>
-        );
-      })}
+        {nav.map((item) => {
+          const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+          return (
+            <Link
+              key={item.to}
+              to={item.to}
+              onClick={() => setMobileOpen(false)}
+              className={cn(
+                "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors",
+                active
+                  ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+            >
+              <item.icon className="h-4 w-4 shrink-0" />
+              {!collapsed ? <span className="truncate">{item.label}</span> : null}
+            </Link>
+          );
+        })}
       </div>
       <div className="mt-3 shrink-0 border-t border-border/60 pt-3">
         <UserMenu collapsed={collapsed} />
@@ -253,11 +250,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               aria-label="Alternar tema"
               className="rounded-xl bg-muted p-2.5 text-muted-foreground transition-colors hover:text-foreground"
             >
-              {theme === "dark" ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
             <button className="relative rounded-xl bg-muted p-2.5 text-muted-foreground transition-colors hover:text-foreground">
               <Bell className="h-4 w-4" />

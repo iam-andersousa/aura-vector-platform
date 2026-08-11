@@ -31,14 +31,78 @@ export const Route = createFileRoute("/jornada")({
 });
 
 const stages = [
-  { name: "Aquisição", area: "Marketing", count: 4820, conv: 100, time: "—", status: "Saudável", tone: "mkt" },
-  { name: "Qualificação", area: "Marketing", count: 1284, conv: 26.6, time: "3 dias", status: "Atenção", tone: "mkt" },
-  { name: "Agendamento", area: "Vendas", count: 612, conv: 47.7, time: "5 dias", status: "Saudável", tone: "sales" },
-  { name: "Venda", area: "Vendas", count: 216, conv: 35.3, time: "12 dias", status: "Gargalo", tone: "sales" },
-  { name: "Onboarding", area: "Apoio", count: 148, conv: 68.5, time: "14 dias", status: "Atenção", tone: "cs" },
-  { name: "Suporte", area: "Apoio", count: 142, conv: 95.9, time: "contínuo", status: "Saudável", tone: "cs" },
-  { name: "Retenção", area: "Apoio", count: 132, conv: 89.2, time: "contínuo", status: "Atenção", tone: "cs" },
-  { name: "Expansão", area: "Apoio", count: 41, conv: 31.1, time: "26 dias", status: "Oportunidade", tone: "cs" },
+  {
+    name: "Aquisição",
+    area: "Marketing",
+    count: 4820,
+    conv: 100,
+    time: "—",
+    status: "Saudável",
+    tone: "mkt",
+  },
+  {
+    name: "Qualificação",
+    area: "Marketing",
+    count: 1284,
+    conv: 26.6,
+    time: "3 dias",
+    status: "Atenção",
+    tone: "mkt",
+  },
+  {
+    name: "Agendamento",
+    area: "Vendas",
+    count: 612,
+    conv: 47.7,
+    time: "5 dias",
+    status: "Saudável",
+    tone: "sales",
+  },
+  {
+    name: "Venda",
+    area: "Vendas",
+    count: 216,
+    conv: 35.3,
+    time: "12 dias",
+    status: "Gargalo",
+    tone: "sales",
+  },
+  {
+    name: "Onboarding",
+    area: "Apoio",
+    count: 148,
+    conv: 68.5,
+    time: "14 dias",
+    status: "Atenção",
+    tone: "cs",
+  },
+  {
+    name: "Suporte",
+    area: "Apoio",
+    count: 142,
+    conv: 95.9,
+    time: "contínuo",
+    status: "Saudável",
+    tone: "cs",
+  },
+  {
+    name: "Retenção",
+    area: "Apoio",
+    count: 132,
+    conv: 89.2,
+    time: "contínuo",
+    status: "Atenção",
+    tone: "cs",
+  },
+  {
+    name: "Expansão",
+    area: "Apoio",
+    count: 41,
+    conv: 31.1,
+    time: "26 dias",
+    status: "Oportunidade",
+    tone: "cs",
+  },
 ] as const;
 
 const statusTone: Record<string, "success" | "warning" | "danger" | "sales"> = {
@@ -70,14 +134,10 @@ function JornadaPage() {
                   <Chip tone={statusTone[s.status] ?? "neutral"}>{s.status}</Chip>
                 </div>
                 <p className="mt-3 text-lg font-display">{s.name}</p>
-                <p className="mt-1 text-2xl font-display">
-                  {s.count.toLocaleString("pt-BR")}
-                </p>
+                <p className="mt-1 text-2xl font-display">{s.count.toLocaleString("pt-BR")}</p>
                 <div className="mt-3 space-y-2">
                   <ProgressBar value={s.conv} tone={s.tone} />
-                  <p className="text-xs text-muted-foreground">
-                    Conversão {s.conv}%
-                  </p>
+                  <p className="text-xs text-muted-foreground">Conversão {s.conv}%</p>
                   <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <Clock className="h-3 w-3" /> {s.time}
                   </p>

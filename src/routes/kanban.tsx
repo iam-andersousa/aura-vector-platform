@@ -2,14 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Filter, Search } from "lucide-react";
 import { useState } from "react";
 
-import {
-  AiBadge,
-  Chip,
-  HealthDots,
-  Modal,
-  PageHeader,
-  ProgressBar,
-} from "@/components/aura/ui";
+import { AiBadge, Chip, HealthDots, Modal, PageHeader, ProgressBar } from "@/components/aura/ui";
 import { kanbanCards, kanbanColumns, type Stakeholder } from "@/lib/aura-data";
 
 export const Route = createFileRoute("/kanban")({
@@ -46,9 +39,7 @@ const prioTone: Record<string, "danger" | "warning" | "neutral"> = {
 function KanbanPage() {
   const [query, setQuery] = useState("");
   const [board, setBoard] = useState<Record<string, Stakeholder[]>>(() =>
-    Object.fromEntries(
-      kanbanColumns.map((c) => [c.title, [...(kanbanCards[c.title] ?? [])]]),
-    ),
+    Object.fromEntries(kanbanColumns.map((c) => [c.title, [...(kanbanCards[c.title] ?? [])]])),
   );
   const [dragging, setDragging] = useState<{ from: string; id: string } | null>(null);
   const [overCol, setOverCol] = useState<string | null>(null);
@@ -109,9 +100,7 @@ function KanbanPage() {
             >
               <div className="mb-3 flex items-center gap-2">
                 <span className={`h-2 w-2 rounded-full ${accentBar[col.accent]}`} />
-                <p className="text-xs font-medium uppercase tracking-[0.14em]">
-                  {col.title}
-                </p>
+                <p className="text-xs font-medium uppercase tracking-[0.14em]">{col.title}</p>
                 <span className="ml-auto rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
                   {cards.length}
                 </span>

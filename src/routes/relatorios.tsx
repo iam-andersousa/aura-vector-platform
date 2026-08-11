@@ -45,12 +45,7 @@ function RelatoriosPage() {
   const [period, setPeriod] = useState<string>("Este mês");
   const [sector, setSector] = useState<string>("Todos");
   const filters = (
-    <AnalyticsFilters
-      period={period}
-      onPeriod={setPeriod}
-      sector={sector}
-      onSector={setSector}
-    />
+    <AnalyticsFilters period={period} onPeriod={setPeriod} sector={sector} onSector={setSector} />
   );
   return (
     <>
@@ -68,9 +63,7 @@ function RelatoriosPage() {
 
       <section className="grid gap-4 lg:grid-cols-3">
         <Panel className="lg:col-span-2">
-          <SectionTitle action={filters}>
-            Receita por canal
-          </SectionTitle>
+          <SectionTitle action={filters}>Receita por canal</SectionTitle>
           <Donut
             centerLabel="R$ mil"
             data={[

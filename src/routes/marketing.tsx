@@ -38,12 +38,7 @@ function MarketingPage() {
   const [period, setPeriod] = useState<string>("Este mês");
   const [sector, setSector] = useState<string>("Todos");
   const filters = (
-    <AnalyticsFilters
-      period={period}
-      onPeriod={setPeriod}
-      sector={sector}
-      onSector={setSector}
-    />
+    <AnalyticsFilters period={period} onPeriod={setPeriod} sector={sector} onSector={setSector} />
   );
   return (
     <>
@@ -59,17 +54,35 @@ function MarketingPage() {
       </PageHeader>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Leads gerados" value="1.661" delta="+9,4%" up accent="mkt" hint="90 dias" />
-        <StatCard label="Qualidade média do lead" value="71" delta="-4,1" hint="score 0-100" accent="mkt" />
+        <StatCard
+          label="Leads gerados"
+          value="1.661"
+          delta="+9,4%"
+          up
+          accent="mkt"
+          hint="90 dias"
+        />
+        <StatCard
+          label="Qualidade média do lead"
+          value="71"
+          delta="-4,1"
+          hint="score 0-100"
+          accent="mkt"
+        />
         <StatCard label="Receita atribuída" value="R$ 3,72M" delta="+14,2%" up accent="mkt" />
-        <StatCard label="CPL médio" value="R$ 38" delta="-6,5%" up accent="mkt" hint="CAC estimado: R$ 4,1k" />
+        <StatCard
+          label="CPL médio"
+          value="R$ 38"
+          delta="-6,5%"
+          up
+          accent="mkt"
+          hint="CAC estimado: R$ 4,1k"
+        />
       </section>
 
       <section className="grid gap-4 lg:grid-cols-3">
         <Panel className="lg:col-span-2">
-          <SectionTitle action={filters}>
-            Canais de aquisição
-          </SectionTitle>
+          <SectionTitle action={filters}>Canais de aquisição</SectionTitle>
           <Donut
             centerLabel="leads"
             data={campaigns.map((c) => ({ label: c.channel, value: c.leads }))}
@@ -116,11 +129,13 @@ function MarketingPage() {
           <table className="w-full min-w-[760px] text-sm">
             <thead>
               <tr className="border-b border-border text-left text-[11px] uppercase tracking-wider text-muted-foreground">
-                {["Campanha", "Canal", "Leads", "Qualidade", "CPL", "Receita", "Status"].map((h) => (
-                  <th key={h} className="px-5 py-3 font-medium">
-                    {h}
-                  </th>
-                ))}
+                {["Campanha", "Canal", "Leads", "Qualidade", "CPL", "Receita", "Status"].map(
+                  (h) => (
+                    <th key={h} className="px-5 py-3 font-medium">
+                      {h}
+                    </th>
+                  ),
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-border">

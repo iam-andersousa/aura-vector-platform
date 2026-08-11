@@ -139,8 +139,8 @@ export function ChatView() {
             </span>
             <h2 className="mt-5 text-2xl font-display">Como posso ajudar hoje?</h2>
             <p className="mt-2 max-w-md text-sm text-muted-foreground">
-              O Vector lê marketing, vendas e apoio ao cliente para responder com
-              contexto de receita e relacionamento.
+              O Vector lê marketing, vendas e apoio ao cliente para responder com contexto de
+              receita e relacionamento.
             </p>
             <div className="mt-7 grid w-full gap-2 sm:grid-cols-2">
               {suggestions.map((s) => (
@@ -173,9 +173,7 @@ export function ChatView() {
                   <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                     <StarMark className="h-4 w-4" />
                   </span>
-                  <p className="max-w-[85%] text-sm leading-relaxed text-foreground">
-                    {m.text}
-                  </p>
+                  <p className="max-w-[85%] text-sm leading-relaxed text-foreground">{m.text}</p>
                 </div>
               ),
             )}
@@ -218,9 +216,7 @@ export function ChatView() {
             type="file"
             multiple
             className="hidden"
-            onChange={(e) =>
-              setFiles(Array.from(e.target.files ?? []).map((f) => f.name))
-            }
+            onChange={(e) => setFiles(Array.from(e.target.files ?? []).map((f) => f.name))}
           />
           <button
             type="button"
@@ -249,9 +245,7 @@ export function ChatView() {
                   <button
                     key={a.name}
                     onClick={() =>
-                      setApps((p) =>
-                        on ? p.filter((x) => x !== a.name) : [...p, a.name],
-                      )
+                      setApps((p) => (on ? p.filter((x) => x !== a.name) : [...p, a.name]))
                     }
                     className="flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-xs transition-colors hover:bg-muted"
                   >
@@ -265,10 +259,7 @@ export function ChatView() {
             </div>
           </Popover>
 
-          <Popover
-            label={modes.find((m) => m.id === mode)?.label ?? "Modo"}
-            icon={Bot}
-          >
+          <Popover label={modes.find((m) => m.id === mode)?.label ?? "Modo"} icon={Bot}>
             {modes.map((m) => (
               <button
                 key={m.id}
@@ -283,9 +274,7 @@ export function ChatView() {
                 />
                 <span>
                   <span className="block text-xs font-medium">{m.label}</span>
-                  <span className="block text-[11px] text-muted-foreground">
-                    {m.desc}
-                  </span>
+                  <span className="block text-[11px] text-muted-foreground">{m.desc}</span>
                 </span>
                 {mode === m.id ? (
                   <Check className="ml-auto mt-0.5 h-3.5 w-3.5 text-primary" />
@@ -308,9 +297,7 @@ export function ChatView() {
               >
                 <Coins className="mt-0.5 h-4 w-4 text-primary" />
                 <span>
-                  <span className="block text-xs font-medium">
-                    Automático (recomendado)
-                  </span>
+                  <span className="block text-xs font-medium">Automático (recomendado)</span>
                   <span className="block text-[11px] text-muted-foreground">
                     Aumenta ou reduz o consumo conforme a complexidade da tarefa
                   </span>

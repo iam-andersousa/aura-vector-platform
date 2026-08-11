@@ -56,18 +56,11 @@ function CommandCenter() {
   const [period, setPeriod] = useState<string>("Este mês");
   const [sector, setSector] = useState<string>("Todos");
   const filters = (
-    <AnalyticsFilters
-      period={period}
-      onPeriod={setPeriod}
-      sector={sector}
-      onSector={setSector}
-    />
+    <AnalyticsFilters period={period} onPeriod={setPeriod} sector={sector} onSector={setSector} />
   );
 
   const visibleKpis = kpis.filter((k) => sector === "Todos" || k.area === sector);
-  const visibleInsights = aiInsights.filter(
-    (i) => sector === "Todos" || i.tag === sector,
-  );
+  const visibleInsights = aiInsights.filter((i) => sector === "Todos" || i.tag === sector);
 
   return (
     <>
@@ -87,9 +80,7 @@ function CommandCenter() {
       </PageHeader>
 
       <section>
-        <SectionTitle action={filters}>
-          Indicadores da operação
-        </SectionTitle>
+        <SectionTitle action={filters}>Indicadores da operação</SectionTitle>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {visibleKpis.map((k) => (
             <StatCard key={k.label} {...k} />
@@ -110,9 +101,7 @@ function CommandCenter() {
 
       <section className="grid gap-4 lg:grid-cols-3">
         <Panel className="lg:col-span-2">
-          <SectionTitle action={filters}>
-            Receita influenciada por mês
-          </SectionTitle>
+          <SectionTitle action={filters}>Receita influenciada por mês</SectionTitle>
           <TrendArea data={revenueTrend} />
         </Panel>
         <Panel>

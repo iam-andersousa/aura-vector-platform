@@ -1,11 +1,4 @@
-import {
-  ArrowDownRight,
-  ArrowUpRight,
-  CalendarDays,
-  Check,
-  Tag,
-  X,
-} from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, CalendarDays, Check, Tag, X } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import {
   Area,
@@ -55,9 +48,7 @@ export function PageHeader({
       <div className="max-w-2xl">
         <p className="eyebrow">{eyebrow}</p>
         <h1 className="mt-2 text-3xl font-display sm:text-4xl">{title}</h1>
-        {subtitle ? (
-          <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p>
-        ) : null}
+        {subtitle ? <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p> : null}
       </div>
       {children ? <div className="flex flex-wrap gap-2">{children}</div> : null}
     </div>
@@ -79,13 +70,7 @@ export function SectionTitle({
   );
 }
 
-export function Panel({
-  className,
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
+export function Panel({ className, children }: { className?: string; children: React.ReactNode }) {
   return <div className={cn("surface p-5 sm:p-6", className)}>{children}</div>;
 }
 
@@ -122,9 +107,7 @@ export function StatCard({
       ) : null}
       <div className="relative">
         <div className="flex items-start justify-between gap-3">
-          <p className="text-xs font-medium tracking-wide text-muted-foreground">
-            {label}
-          </p>
+          <p className="text-xs font-medium tracking-wide text-muted-foreground">{label}</p>
           {accent ? <Dot accent={accent} /> : null}
         </div>
         <p className="mt-3 text-2xl font-display font-bold tracking-tight">{value}</p>
@@ -133,16 +116,10 @@ export function StatCard({
             <span
               className={cn(
                 "inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-bold",
-                up
-                  ? "bg-success/10 text-success"
-                  : "bg-destructive/10 text-destructive",
+                up ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive",
               )}
             >
-              {up ? (
-                <ArrowUpRight className="h-3 w-3" />
-              ) : (
-                <ArrowDownRight className="h-3 w-3" />
-              )}
+              {up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
               {delta}
             </span>
           ) : null}
@@ -226,17 +203,12 @@ export function Modal({
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-foreground/40 backdrop-blur-sm"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-foreground/40 backdrop-blur-sm" onClick={onClose} />
       <div className="surface relative z-10 max-h-[85vh] w-full max-w-lg overflow-y-auto p-6 shadow-2xl">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h3 className="text-xl font-display">{title}</h3>
-            {subtitle ? (
-              <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>
-            ) : null}
+            {subtitle ? <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p> : null}
           </div>
           <button
             onClick={onClose}
@@ -304,9 +276,7 @@ export function Dot({
     warning: "bg-warning",
     destructive: "bg-destructive",
   };
-  return (
-    <span className={cn("h-2 w-2 rounded-full", map[accent], className)} />
-  );
+  return <span className={cn("h-2 w-2 rounded-full", map[accent], className)} />;
 }
 
 export function Chip({
@@ -392,9 +362,7 @@ export function AiCard({
               </span>
             ) : null}
           </div>
-          <p className="mt-8 text-sm font-display font-bold leading-snug text-white">
-            {title}
-          </p>
+          <p className="mt-8 text-sm font-display font-bold leading-snug text-white">{title}</p>
           <p className="mt-2 text-xs leading-relaxed text-white/75">{body}</p>
           <span className="mt-4 text-[11px] font-medium text-white/70 group-hover:text-white">
             Ver recomendações →
@@ -458,13 +426,7 @@ export const datePresets = [
   "Período personalizado",
 ] as const;
 
-export function DateFilter({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-}) {
+export function DateFilter({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [open, setOpen] = useState(false);
   const [custom, setCustom] = useState(false);
   const [from, setFrom] = useState("");
@@ -527,10 +489,7 @@ export function DateFilter({
                 disabled={!from || !to}
                 onClick={() => {
                   onChange(
-                    `${from.split("-").reverse().join("/")} – ${to
-                      .split("-")
-                      .reverse()
-                      .join("/")}`,
+                    `${from.split("-").reverse().join("/")} – ${to.split("-").reverse().join("/")}`,
                   );
                   setOpen(false);
                   setCustom(false);
@@ -547,12 +506,7 @@ export function DateFilter({
   );
 }
 
-export const sectorOptions = [
-  "Todos",
-  "Marketing",
-  "Vendas",
-  "Apoio ao Cliente",
-] as const;
+export const sectorOptions = ["Todos", "Marketing", "Vendas", "Apoio ao Cliente"] as const;
 
 export function CategoryFilter({
   value,
@@ -667,17 +621,12 @@ export function RoundedBars({
   height?: number;
   highlight?: number;
 }) {
-  const avg =
-    data.reduce((s, d) => s + Number(d[dataKey] ?? 0), 0) / Math.max(1, data.length);
+  const avg = data.reduce((s, d) => s + Number(d[dataKey] ?? 0), 0) / Math.max(1, data.length);
   return (
     <div style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 0, left: -20, bottom: 0 }}>
-          <CartesianGrid
-            vertical={false}
-            stroke="var(--color-border)"
-            strokeDasharray="3 6"
-          />
+          <CartesianGrid vertical={false} stroke="var(--color-border)" strokeDasharray="3 6" />
           <XAxis
             dataKey={labelKey}
             tickLine={false}
@@ -725,8 +674,7 @@ export function TrendArea({
   color?: string;
   height?: number;
 }) {
-  const avg =
-    data.reduce((s, d) => s + Number(d["value"] ?? 0), 0) / Math.max(1, data.length);
+  const avg = data.reduce((s, d) => s + Number(d["value"] ?? 0), 0) / Math.max(1, data.length);
   return (
     <div style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
@@ -737,11 +685,7 @@ export function TrendArea({
               <stop offset="100%" stopColor={color} stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid
-            vertical={false}
-            stroke="var(--color-border)"
-            strokeDasharray="3 6"
-          />
+          <CartesianGrid vertical={false} stroke="var(--color-border)" strokeDasharray="3 6" />
           <XAxis
             dataKey="label"
             tickLine={false}
@@ -792,14 +736,7 @@ export function Gauge({
   return (
     <div className="flex items-center gap-4">
       <svg viewBox="0 0 100 100" className="h-24 w-24 -rotate-90">
-        <circle
-          cx="50"
-          cy="50"
-          r={r}
-          fill="none"
-          stroke="var(--color-muted)"
-          strokeWidth="8"
-        />
+        <circle cx="50" cy="50" r={r} fill="none" stroke="var(--color-muted)" strokeWidth="8" />
         <circle
           cx="50"
           cy="50"
@@ -890,18 +827,11 @@ export function Donut({
 
 export function HealthDots({ value }: { value: number }) {
   const filled = Math.round(value / 20);
-  const tone =
-    value >= 80 ? "bg-success" : value >= 60 ? "bg-warning" : "bg-destructive";
+  const tone = value >= 80 ? "bg-success" : value >= 60 ? "bg-warning" : "bg-destructive";
   return (
     <div className="flex items-center gap-1.5">
       {[0, 1, 2, 3, 4].map((i) => (
-        <span
-          key={i}
-          className={cn(
-            "h-2 w-2 rounded-full",
-            i < filled ? tone : "bg-muted",
-          )}
-        />
+        <span key={i} className={cn("h-2 w-2 rounded-full", i < filled ? tone : "bg-muted")} />
       ))}
       <span className="ml-1 text-xs text-muted-foreground">{value}</span>
     </div>
