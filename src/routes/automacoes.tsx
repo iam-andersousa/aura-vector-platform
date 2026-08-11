@@ -72,9 +72,7 @@ function AutomacoesPage() {
               <Chip tone={areaTone[a.area] ?? "neutral"}>{a.area}</Chip>
               <span className="text-xs text-muted-foreground">{a.runs} execuções</span>
               <button
-                onClick={() =>
-                  setActive((prev) => prev.map((v, j) => (i === j ? !v : v)))
-                }
+                onClick={() => setActive((prev) => prev.map((v, j) => (i === j ? !v : v)))}
                 aria-label="Ativar automação"
                 className={`relative h-6 w-11 rounded-full transition-colors ${
                   active[i] ? "bg-primary" : "bg-muted"

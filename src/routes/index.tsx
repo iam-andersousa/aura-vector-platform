@@ -4,13 +4,13 @@ import { useState } from "react";
 
 import {
   AiCard,
+  AnalyticsFilters,
   Chip,
   Donut,
   Panel,
   PageHeader,
   ProgressBar,
   RoundedBars,
-  SegmentedFilter,
   SectionTitle,
   StatCard,
   TrendArea,
@@ -52,17 +52,15 @@ const areaTone: Record<string, "mkt" | "sales" | "cs"> = {
   "Apoio ao Cliente": "cs",
 };
 
-const periods = ["30 dias", "90 dias", "12 meses"] as const;
-const sectors = ["Todos", "Marketing", "Vendas", "Apoio ao Cliente"] as const;
-
 function CommandCenter() {
-  const [period, setPeriod] = useState<string>("90 dias");
+  const [period, setPeriod] = useState<string>("Este mês");
   const [sector, setSector] = useState<string>("Todos");
+  const filters = (
+    <AnalyticsFilters period={period} onPeriod={setPeriod} sector={sector} onSector={setSector} />
+  );
 
   const visibleKpis = kpis.filter((k) => sector === "Todos" || k.area === sector);
-  const visibleInsights = aiInsights.filter(
-    (i) => sector === "Todos" || i.tag === sector,
-  );
+  const visibleInsights = aiInsights.filter((i) => sector === "Todos" || i.tag === sector);
 
   return (
     <>
@@ -71,8 +69,7 @@ function CommandCenter() {
         title="Clareza para vender, atender e crescer."
         subtitle="Marketing, vendas e apoio ao cliente na mesma visão de receita e relacionamento."
       >
-        <SegmentedFilter options={periods} value={period} onChange={setPeriod} />
-        <SegmentedFilter options={sectors} value={sector} onChange={setSector} />
+        {filters}
         <Link
           to="/jornada"
           className="inline-flex items-center gap-2 rounded-xl bg-primary px-3.5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90"
@@ -83,9 +80,7 @@ function CommandCenter() {
       </PageHeader>
 
       <section>
-        <SectionTitle action={<Chip tone="sales">{period}</Chip>}>
-          Indicadores da operação
-        </SectionTitle>
+        <SectionTitle action={filters}>Indicadores da operação</SectionTitle>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {visibleKpis.map((k) => (
             <StatCard key={k.label} {...k} />
@@ -99,20 +94,18 @@ function CommandCenter() {
         </SectionTitle>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {visibleInsights.map((i) => (
-            <AiCard key={i.title} {...i} />
+            <AiCard key={i.title} title={i.title} body={i.body} tag={i.tag} items={i.actions} />
           ))}
         </div>
       </section>
 
       <section className="grid gap-4 lg:grid-cols-3">
         <Panel className="lg:col-span-2">
-          <SectionTitle action={<Chip tone="sales">R$ 4,82M</Chip>}>
-            Receita influenciada por mês
-          </SectionTitle>
+          <SectionTitle action={filters}>Receita influenciada por mês</SectionTitle>
           <TrendArea data={revenueTrend} />
         </Panel>
         <Panel>
-          <SectionTitle>Conversão por etapa</SectionTitle>
+          <SectionTitle action={filters}>Conversão por etapa</SectionTitle>
           <div className="space-y-4">
             {funnel.map((f) => (
               <div key={f.stage}>
@@ -165,7 +158,7 @@ function CommandCenter() {
 
       <section className="grid gap-4 lg:grid-cols-2">
         <Panel>
-          <SectionTitle>Leads por canal</SectionTitle>
+          <SectionTitle action={filters}>Leads por canal</SectionTitle>
           <Donut
             centerLabel="leads"
             data={[
@@ -178,7 +171,7 @@ function CommandCenter() {
           />
         </Panel>
         <Panel>
-          <SectionTitle>Tempo médio por etapa (dias)</SectionTitle>
+          <SectionTitle action={filters}>Tempo médio por etapa (dias)</SectionTitle>
           <RoundedBars
             data={[
               { label: "Qualif.", value: 3 },

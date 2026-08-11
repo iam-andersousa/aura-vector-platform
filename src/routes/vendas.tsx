@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { PhoneCall } from "lucide-react";
 
 import {
   AiCard,
   Chip,
   Gauge,
+  AnalyticsFilters,
   PageHeader,
   Panel,
   ProgressBar,
@@ -51,6 +53,11 @@ const forecast = [
 ];
 
 function VendasPage() {
+  const [period, setPeriod] = useState<string>("Este mês");
+  const [sector, setSector] = useState<string>("Todos");
+  const filters = (
+    <AnalyticsFilters period={period} onPeriod={setPeriod} sector={sector} onSector={setSector} />
+  );
   return (
     <>
       <PageHeader
@@ -59,20 +66,26 @@ function VendasPage() {
         subtitle="Cada oportunidade traz origem, histórico e o próximo passo recomendado."
       >
         <Chip tone="sales">216 oportunidades abertas</Chip>
+        {filters}
       </PageHeader>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Pipeline total" value="R$ 9,1M" delta="+6,2%" up accent="sales" />
-        <StatCard label="Speed to Lead" value="6m 12s" delta="-1m 40s" up hint="meta: 5 min" accent="sales" />
+        <StatCard
+          label="Speed to Lead"
+          value="6m 12s"
+          delta="-1m 40s"
+          up
+          hint="meta: 5 min"
+          accent="sales"
+        />
         <StatCard label="Show-up rate" value="72%" delta="+4,2%" up accent="sales" />
         <StatCard label="Taxa de fechamento" value="29,4%" delta="+1,8%" up accent="sales" />
       </section>
 
       <section className="grid gap-4 lg:grid-cols-3">
         <Panel className="lg:col-span-2">
-          <SectionTitle action={<Chip tone="sales">R$ mil</Chip>}>
-            Pipeline comercial por etapa
-          </SectionTitle>
+          <SectionTitle action={filters}>Pipeline comercial por etapa</SectionTitle>
           <Donut data={pipeline} centerLabel="R$ mil" />
         </Panel>
         <Panel>

@@ -19,10 +19,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     window.localStorage.setItem("aura-theme", theme);
   }, [theme]);
 
-  const toggle = useCallback(
-    () => setTheme((t) => (t === "dark" ? "light" : "dark")),
-    [],
-  );
+  const toggle = useCallback(() => setTheme((t) => (t === "dark" ? "light" : "dark")), []);
 
   return <ThemeCtx.Provider value={{ theme, toggle }}>{children}</ThemeCtx.Provider>;
 }

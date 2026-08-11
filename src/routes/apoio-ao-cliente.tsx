@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { AlertOctagon } from "lucide-react";
 
 import {
@@ -6,6 +7,7 @@ import {
   Chip,
   Gauge,
   HealthDots,
+  AnalyticsFilters,
   PageHeader,
   Panel,
   ProgressBar,
@@ -41,6 +43,11 @@ const riskTone: Record<string, "danger" | "warning" | "success"> = {
 };
 
 function ApoioPage() {
+  const [period, setPeriod] = useState<string>("Este mês");
+  const [sector, setSector] = useState<string>("Todos");
+  const filters = (
+    <AnalyticsFilters period={period} onPeriod={setPeriod} sector={sector} onSector={setSector} />
+  );
   return (
     <>
       <PageHeader
@@ -49,13 +56,27 @@ function ApoioPage() {
         subtitle="CS, CX, suporte, atendimento e onboarding operando com o mesmo contexto de vendas e marketing."
       >
         <Chip tone="cs">132 clientes ativos</Chip>
+        {filters}
       </PageHeader>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Clientes ativos" value="132" delta="+6" up accent="cs" />
-        <StatCard label="Tickets abertos" value="48" delta="-11" up hint="13 críticos" accent="cs" />
+        <StatCard
+          label="Tickets abertos"
+          value="48"
+          delta="-11"
+          up
+          hint="13 críticos"
+          accent="cs"
+        />
         <StatCard label="SLA de resposta" value="93%" delta="+2,4%" up accent="cs" />
-        <StatCard label="Risco de churn" value="7 contas" delta="+2" hint="R$ 1,1M em ARR" accent="cs" />
+        <StatCard
+          label="Risco de churn"
+          value="7 contas"
+          delta="+2"
+          hint="R$ 1,1M em ARR"
+          accent="cs"
+        />
       </section>
 
       <section className="grid gap-4 lg:grid-cols-3">

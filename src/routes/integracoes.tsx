@@ -61,9 +61,7 @@ function IntegracoesPage() {
       </PageHeader>
 
       {integrations.map((group) => {
-        const items = group.items.filter(
-          ([, status]) => filter === "Todos" || status === filter,
-        );
+        const items = group.items.filter(([, status]) => filter === "Todos" || status === filter);
         if (items.length === 0) return null;
         return (
           <section key={group.group}>

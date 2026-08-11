@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { Download, FileBarChart } from "lucide-react";
 
 import {
   Chip,
+  AnalyticsFilters,
   PageHeader,
   Panel,
   ProgressBar,
@@ -40,6 +42,11 @@ const areaTone: Record<string, "mkt" | "sales" | "cs" | "neutral"> = {
 };
 
 function RelatoriosPage() {
+  const [period, setPeriod] = useState<string>("Este mês");
+  const [sector, setSector] = useState<string>("Todos");
+  const filters = (
+    <AnalyticsFilters period={period} onPeriod={setPeriod} sector={sector} onSector={setSector} />
+  );
   return (
     <>
       <PageHeader
@@ -51,13 +58,12 @@ function RelatoriosPage() {
           <Download className="h-4 w-4" />
           Exportar tudo
         </button>
+        {filters}
       </PageHeader>
 
       <section className="grid gap-4 lg:grid-cols-3">
         <Panel className="lg:col-span-2">
-          <SectionTitle action={<Chip tone="sales">R$ mil</Chip>}>
-            Receita por canal
-          </SectionTitle>
+          <SectionTitle action={filters}>Receita por canal</SectionTitle>
           <Donut
             centerLabel="R$ mil"
             data={[

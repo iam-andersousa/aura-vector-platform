@@ -3,10 +3,12 @@ import {
   Bell,
   Bot,
   ChevronLeft,
+  ChevronUp,
   FileBarChart,
   Gauge,
   HelpCircle,
   KanbanSquare,
+  LayoutDashboard,
   LayoutGrid,
   LifeBuoy,
   LogOut,
@@ -31,7 +33,9 @@ import logoLight from "@/assets/aura-logo-light.png.asset.json";
 import markDark from "@/assets/aura-mark-dark.png.asset.json";
 import markWhite from "@/assets/aura-mark-white.png.asset.json";
 import profilePic from "@/assets/profile-user.png.asset.json";
+import { ChatView } from "@/components/aura/ChatView";
 import { useTheme } from "@/components/aura/theme";
+import { StarMark } from "@/components/aura/ui";
 import { cn } from "@/lib/utils";
 
 const nav = [
@@ -56,7 +60,7 @@ function Logo({ collapsed }: { collapsed: boolean }) {
       <img
         src={theme === "dark" ? markWhite.url : markDark.url}
         alt="Aura Vector"
-        className="h-11 w-11"
+        className="h-12 w-12"
       />
     );
   }
@@ -64,12 +68,12 @@ function Logo({ collapsed }: { collapsed: boolean }) {
     <img
       src={theme === "dark" ? logoLight.url : logoDark.url}
       alt="Aura Vector"
-      className="h-11 w-auto"
+      className="h-[54px] w-auto max-w-full object-contain object-left"
     />
   );
 }
 
-function UserMenu() {
+function UserMenu({ collapsed }: { collapsed?: boolean }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -90,25 +94,33 @@ function UserMenu() {
   ] as const;
 
   return (
-    <div className="relative pl-1" ref={ref}>
+    <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="flex items-center gap-2 rounded-full p-0.5 transition-colors hover:bg-muted"
+        className={cn(
+          "flex w-full items-center gap-2.5 rounded-xl p-2 transition-colors hover:bg-muted",
+          collapsed && "justify-center",
+        )}
       >
         <img
           src={profilePic.url}
           alt="Marina Souza"
-          className="h-9 w-9 rounded-full object-cover"
+          className="h-9 w-9 shrink-0 rounded-full object-cover"
         />
-        <div className="hidden pr-1 text-left leading-tight xl:block">
-          <p className="text-xs font-medium">Marina Souza</p>
-          <p className="text-[11px] text-muted-foreground">Head de RevOps</p>
-        </div>
+        {!collapsed ? (
+          <>
+            <div className="min-w-0 flex-1 text-left leading-tight">
+              <p className="truncate text-xs font-medium">Marina Souza</p>
+              <p className="truncate text-[11px] text-muted-foreground">Head de RevOps</p>
+            </div>
+            <ChevronUp className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+          </>
+        ) : null}
       </button>
       {open ? (
-        <div className="surface absolute right-0 top-[calc(100%+10px)] z-50 w-56 overflow-hidden p-1.5 shadow-xl">
+        <div className="surface absolute bottom-[calc(100%+10px)] left-0 z-50 w-56 overflow-hidden p-1.5 shadow-xl">
           {items.map((item) =>
             "to" in item && item.to ? (
               <Link
@@ -141,50 +153,41 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { theme, toggle } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [view, setView] = useState<"dashboard" | "chat">("dashboard");
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const sidebar = (
     <nav className="flex h-full flex-col gap-1 p-3">
-      {nav.map((item) => {
-        const active =
-          item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
-        return (
-          <Link
-            key={item.to}
-            to={item.to}
-            onClick={() => setMobileOpen(false)}
-            className={cn(
-              "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors",
-              active
-                ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground",
-            )}
-          >
-            <item.icon className="h-4 w-4 shrink-0" />
-            {!collapsed ? <span className="truncate">{item.label}</span> : null}
-          </Link>
-        );
-      })}
-      <div className="mt-auto">
-        {!collapsed ? (
-          <div className="gradient-aura rounded-2xl p-[1.5px]">
-            <div className="rounded-[15px] bg-card p-4">
-              <p className="text-xs font-display leading-snug">
-                Clareza para vender, atender e crescer.
-              </p>
-              <p className="mt-1 text-[11px] text-muted-foreground">
-                RevOps Intelligence
-              </p>
-            </div>
-          </div>
-        ) : null}
+      <div className="min-h-0 flex-1 space-y-1 overflow-y-auto">
+        {nav.map((item) => {
+          const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+          return (
+            <Link
+              key={item.to}
+              to={item.to}
+              onClick={() => setMobileOpen(false)}
+              className={cn(
+                "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors",
+                active
+                  ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+            >
+              <item.icon className="h-4 w-4 shrink-0" />
+              {!collapsed ? <span className="truncate">{item.label}</span> : null}
+            </Link>
+          );
+        })}
+      </div>
+      <div className="mt-3 shrink-0 border-t border-border/60 pt-3">
+        <UserMenu collapsed={collapsed} />
       </div>
     </nav>
   );
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
+      <header className="glass-header sticky top-0 z-40">
         <div className="flex h-16 items-center gap-3 px-4 sm:px-6">
           <button
             className="rounded-lg p-2 hover:bg-muted lg:hidden"
@@ -216,18 +219,40 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="ml-auto flex items-center gap-2 md:ml-0">
+            <div className="flex items-center gap-1 rounded-xl bg-muted p-1">
+              <button
+                onClick={() => setView("dashboard")}
+                aria-label="Visão de dashboard"
+                className={cn(
+                  "rounded-lg p-1.5 transition-colors",
+                  view === "dashboard"
+                    ? "bg-card text-primary shadow-sm"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <LayoutDashboard className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setView("chat")}
+                aria-label="Visão de chat com o Vector"
+                className={cn(
+                  "rounded-lg p-1.5 transition-colors",
+                  view === "chat"
+                    ? "bg-card text-primary shadow-sm"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <StarMark className="h-4 w-4" />
+              </button>
+            </div>
             <button
               onClick={toggle}
               aria-label="Alternar tema"
-              className="rounded-xl border border-border p-2.5 text-muted-foreground transition-colors hover:text-foreground"
+              className="rounded-xl bg-muted p-2.5 text-muted-foreground transition-colors hover:text-foreground"
             >
-              {theme === "dark" ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
-            <button className="relative rounded-xl border border-border p-2.5 text-muted-foreground transition-colors hover:text-foreground">
+            <button className="relative rounded-xl bg-muted p-2.5 text-muted-foreground transition-colors hover:text-foreground">
               <Bell className="h-4 w-4" />
               <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-cs" />
             </button>
@@ -235,7 +260,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Nova ação</span>
             </button>
-            <UserMenu />
           </div>
         </div>
       </header>
@@ -276,7 +300,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         ) : null}
 
         <main className="min-w-0 flex-1 px-4 py-8 sm:px-6 lg:px-10">
-          <div className="mx-auto max-w-[1400px] space-y-10">{children}</div>
+          <div className="mx-auto max-w-[1400px] space-y-10">
+            {view === "chat" ? <ChatView /> : children}
+          </div>
         </main>
       </div>
     </div>
