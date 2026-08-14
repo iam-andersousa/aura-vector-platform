@@ -34,6 +34,8 @@ import markDark from "@/assets/aura-mark-dark.png.asset.json";
 import markWhite from "@/assets/aura-mark-white.png.asset.json";
 import profilePic from "@/assets/profile-user.png.asset.json";
 import { ChatView } from "@/components/aura/ChatView";
+import { ChatSidebar } from "@/components/aura/ChatSidebar";
+import { SettingsModal } from "@/components/aura/SettingsModal";
 import { useTheme } from "@/components/aura/theme";
 import { StarMark } from "@/components/aura/ui";
 import { cn } from "@/lib/utils";
@@ -50,7 +52,6 @@ const nav = [
   { to: "/integracoes", label: "Integrações", icon: Plug },
   { to: "/automacoes", label: "Automações", icon: Workflow },
   { to: "/relatorios", label: "Relatórios", icon: FileBarChart },
-  { to: "/configuracoes", label: "Configurações", icon: Settings },
 ] as const;
 
 function Logo({ collapsed }: { collapsed: boolean }) {
@@ -60,7 +61,7 @@ function Logo({ collapsed }: { collapsed: boolean }) {
       <img
         src={theme === "dark" ? markWhite.url : markDark.url}
         alt="Aura Vector"
-        className="h-12 w-12"
+        className="h-14 w-14"
       />
     );
   }
@@ -68,12 +69,18 @@ function Logo({ collapsed }: { collapsed: boolean }) {
     <img
       src={theme === "dark" ? logoLight.url : logoDark.url}
       alt="Aura Vector"
-      className="h-[54px] w-auto max-w-full object-contain object-left"
+      className="h-[72px] w-auto max-w-full object-contain object-left"
     />
   );
 }
 
-function UserMenu({ collapsed }: { collapsed?: boolean }) {
+function UserMenu({
+  collapsed,
+  onSettings,
+}: {
+  collapsed?: boolean;
+  onSettings: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -87,7 +94,7 @@ function UserMenu({ collapsed }: { collapsed?: boolean }) {
   }, [open]);
 
   const items = [
-    { label: "Configurações", icon: Settings, to: "/configuracoes" },
+    { label: "Configurações", icon: Settings, action: onSettings },
     { label: "Fazer upgrade", icon: Rocket },
     { label: "Ajuda & suporte", icon: HelpCircle },
     { label: "Sair", icon: LogOut },
@@ -121,28 +128,19 @@ function UserMenu({ collapsed }: { collapsed?: boolean }) {
       </button>
       {open ? (
         <div className="surface absolute bottom-[calc(100%+10px)] left-0 z-50 w-56 overflow-hidden p-1.5 shadow-xl">
-          {items.map((item) =>
-            "to" in item && item.to ? (
-              <Link
-                key={item.label}
-                to={item.to}
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              >
-                <item.icon className="h-4 w-4" />
-                {item.label}
-              </Link>
-            ) : (
-              <button
-                key={item.label}
-                onClick={() => setOpen(false)}
-                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              >
-                <item.icon className="h-4 w-4" />
-                {item.label}
-              </button>
-            ),
-          )}
+          {items.map((item) => (
+            <button
+              key={item.label}
+              onClick={() => {
+                setOpen(false);
+                if ("action" in item && item.action) item.action();
+              }}
+              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <item.icon className="h-4 w-4" />
+              {item.label}
+            </button>
+          ))}
         </div>
       ) : null}
     </div>
