@@ -74,9 +74,19 @@ export function Panel({ className, children }: { className?: string; children: R
   return <div className={cn("surface p-5 sm:p-6", className)}>{children}</div>;
 }
 
+const segmentName: Record<string, string> = {
+  mkt: "Marketing",
+  sales: "Vendas",
+  cs: "Apoio ao Cliente",
+};
+
+const segmentTone: Record<string, string> = {
+  mkt: "text-mkt",
+  sales: "text-sales",
+  cs: "text-cs",
+};
+
 export function StatCard({
-  ...(() => [])
-}) {}
   label,
   value,
   delta,
