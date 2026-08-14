@@ -157,7 +157,7 @@
   h3,
   h4 {
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 400;
     letter-spacing: -0.015em;
   }
 
@@ -195,7 +195,7 @@
 
 @utility font-display {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 400;
 }
 
 @utility eyebrow {
@@ -236,4 +236,9 @@
 @utility glass-header {
   background-color: color-mix(in oklab, var(--color-background) 45%, transparent);
   backdrop-filter: blur(20px) saturate(160%);
+  border-bottom: 1px solid var(--color-border);
+}
+
+@utility overlay-dim {
+  background-color: oklch(0 0 0 / 55%);
 }

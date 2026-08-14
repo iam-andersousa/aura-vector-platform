@@ -74,6 +74,18 @@ export function Panel({ className, children }: { className?: string; children: R
   return <div className={cn("surface p-5 sm:p-6", className)}>{children}</div>;
 }
 
+const segmentName: Record<string, string> = {
+  mkt: "Marketing",
+  sales: "Vendas",
+  cs: "Apoio ao Cliente",
+};
+
+const segmentTone: Record<string, string> = {
+  mkt: "text-mkt",
+  sales: "text-sales",
+  cs: "text-cs",
+};
+
 export function StatCard({
   label,
   value,
@@ -108,7 +120,11 @@ export function StatCard({
       <div className="relative">
         <div className="flex items-start justify-between gap-3">
           <p className="text-xs font-medium tracking-wide text-muted-foreground">{label}</p>
-          {accent ? <Dot accent={accent} /> : null}
+          {accent ? (
+            <span className={cn("text-[10px] font-medium uppercase tracking-wider", segmentTone[accent])}>
+              {segmentName[accent]}
+            </span>
+          ) : null}
         </div>
         <p className="mt-3 text-2xl font-display font-bold tracking-tight">{value}</p>
         <div className="mt-2 flex items-center gap-2 text-xs">
@@ -203,7 +219,7 @@ export function Modal({
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-foreground/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="overlay-dim absolute inset-0" onClick={onClose} />
       <div className="surface relative z-10 max-h-[85vh] w-full max-w-lg overflow-y-auto p-6 shadow-2xl">
         <div className="flex items-start justify-between gap-4">
           <div>

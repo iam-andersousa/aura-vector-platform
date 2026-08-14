@@ -34,6 +34,8 @@ import markDark from "@/assets/aura-mark-dark.png.asset.json";
 import markWhite from "@/assets/aura-mark-white.png.asset.json";
 import profilePic from "@/assets/profile-user.png.asset.json";
 import { ChatView } from "@/components/aura/ChatView";
+import { ChatSidebar } from "@/components/aura/ChatSidebar";
+import { SettingsModal } from "@/components/aura/SettingsModal";
 import { useTheme } from "@/components/aura/theme";
 import { StarMark } from "@/components/aura/ui";
 import { cn } from "@/lib/utils";
@@ -50,7 +52,6 @@ const nav = [
   { to: "/integracoes", label: "Integrações", icon: Plug },
   { to: "/automacoes", label: "Automações", icon: Workflow },
   { to: "/relatorios", label: "Relatórios", icon: FileBarChart },
-  { to: "/configuracoes", label: "Configurações", icon: Settings },
 ] as const;
 
 function Logo({ collapsed }: { collapsed: boolean }) {
@@ -60,7 +61,7 @@ function Logo({ collapsed }: { collapsed: boolean }) {
       <img
         src={theme === "dark" ? markWhite.url : markDark.url}
         alt="Aura Vector"
-        className="h-12 w-12"
+        className="h-14 w-14"
       />
     );
   }
@@ -68,12 +69,18 @@ function Logo({ collapsed }: { collapsed: boolean }) {
     <img
       src={theme === "dark" ? logoLight.url : logoDark.url}
       alt="Aura Vector"
-      className="h-[54px] w-auto max-w-full object-contain object-left"
+      className="h-[72px] w-auto max-w-full object-contain object-left"
     />
   );
 }
 
-function UserMenu({ collapsed }: { collapsed?: boolean }) {
+function UserMenu({
+  collapsed,
+  onSettings,
+}: {
+  collapsed?: boolean;
+  onSettings: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -87,7 +94,7 @@ function UserMenu({ collapsed }: { collapsed?: boolean }) {
   }, [open]);
 
   const items = [
-    { label: "Configurações", icon: Settings, to: "/configuracoes" },
+    { label: "Configurações", icon: Settings, action: onSettings },
     { label: "Fazer upgrade", icon: Rocket },
     { label: "Ajuda & suporte", icon: HelpCircle },
     { label: "Sair", icon: LogOut },
@@ -121,28 +128,19 @@ function UserMenu({ collapsed }: { collapsed?: boolean }) {
       </button>
       {open ? (
         <div className="surface absolute bottom-[calc(100%+10px)] left-0 z-50 w-56 overflow-hidden p-1.5 shadow-xl">
-          {items.map((item) =>
-            "to" in item && item.to ? (
-              <Link
-                key={item.label}
-                to={item.to}
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              >
-                <item.icon className="h-4 w-4" />
-                {item.label}
-              </Link>
-            ) : (
-              <button
-                key={item.label}
-                onClick={() => setOpen(false)}
-                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              >
-                <item.icon className="h-4 w-4" />
-                {item.label}
-              </button>
-            ),
-          )}
+          {items.map((item) => (
+            <button
+              key={item.label}
+              onClick={() => {
+                setOpen(false);
+                if ("action" in item && item.action) item.action();
+              }}
+              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <item.icon className="h-4 w-4" />
+              {item.label}
+            </button>
+          ))}
         </div>
       ) : null}
     </div>
@@ -154,9 +152,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [view, setView] = useState<"dashboard" | "chat">("dashboard");
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  const sidebar = (
+  const dashboardSidebar = (
     <nav className="flex h-full flex-col gap-1 p-3">
       <div className="min-h-0 flex-1 space-y-1 overflow-y-auto">
         {nav.map((item) => {
@@ -180,15 +182,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         })}
       </div>
       <div className="mt-3 shrink-0 border-t border-border/60 pt-3">
-        <UserMenu collapsed={collapsed} />
+        <UserMenu collapsed={collapsed} onSettings={() => setSettingsOpen(true)} />
       </div>
     </nav>
   );
 
+  const sidebar =
+    view === "chat" ? (
+      <div className="flex h-full flex-col">
+        <div className="min-h-0 flex-1">
+          <ChatSidebar collapsed={collapsed} />
+        </div>
+        <div className="shrink-0 border-t border-border/60 p-3">
+          <UserMenu collapsed={collapsed} onSettings={() => setSettingsOpen(true)} />
+        </div>
+      </div>
+    ) : (
+      dashboardSidebar
+    );
+
   return (
     <div className="min-h-screen bg-background">
       <header className="glass-header sticky top-0 z-40">
-        <div className="flex h-16 items-center gap-3 px-4 sm:px-6">
+        <div className="flex h-20 items-center gap-3 px-4 sm:px-6">
           <button
             className="rounded-lg p-2 hover:bg-muted lg:hidden"
             onClick={() => setMobileOpen(true)}
@@ -210,12 +226,41 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="relative ml-auto hidden max-w-md flex-1 md:block">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setSearchOpen(true);
+              }}
+              onFocus={() => setSearchOpen(true)}
               placeholder="Buscar stakeholders, contas, campanhas…"
-              className="h-10 w-full rounded-xl border border-border bg-card pl-9 pr-16 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring/40"
+              className="relative z-50 h-10 w-full rounded-xl border border-border bg-card pl-9 pr-16 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring/40"
             />
             <kbd className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground">
               ⌘K
             </kbd>
+            {searchOpen ? (
+              <div className="surface absolute left-0 right-0 top-[calc(100%+8px)] z-50 p-2 shadow-2xl">
+                <p className="eyebrow px-2 py-1.5">Resultados</p>
+                {[
+                  ["Nova Lima Tech", "Conta · health 48"],
+                  ["Grupo Vertex", "Negociação · R$ 184 mil"],
+                  ["Campanha LinkedIn ABM", "Marketing · CPL R$ 92"],
+                  ["Marina Souza", "Pessoa · RevOps"],
+                ]
+                  .filter(([n]) =>
+                    (n as string).toLowerCase().includes(search.trim().toLowerCase()),
+                  )
+                  .map(([n, d]) => (
+                    <button
+                      key={n}
+                      className="flex w-full flex-col items-start rounded-lg px-2.5 py-2 text-left transition-colors hover:bg-muted"
+                    >
+                      <span className="text-sm">{n}</span>
+                      <span className="text-[11px] text-muted-foreground">{d}</span>
+                    </button>
+                  ))}
+              </div>
+            ) : null}
           </div>
 
           <div className="ml-auto flex items-center gap-2 md:ml-0">
@@ -252,10 +297,31 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
-            <button className="relative rounded-xl bg-muted p-2.5 text-muted-foreground transition-colors hover:text-foreground">
-              <Bell className="h-4 w-4" />
-              <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-cs" />
-            </button>
+            <div className="relative z-50">
+              <button
+                onClick={() => setNotifOpen((o) => !o)}
+                aria-label="Notificações"
+                className="relative rounded-xl bg-muted p-2.5 text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <Bell className="h-4 w-4" />
+                <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-cs" />
+              </button>
+              {notifOpen ? (
+                <div className="surface absolute right-0 top-[calc(100%+8px)] w-80 p-2 shadow-2xl">
+                  <p className="eyebrow px-2 py-1.5">Notificações</p>
+                  {[
+                    ["Speed to lead estourado", "3 leads sem contato há 12 min"],
+                    ["Health score em queda", "Orbita Log caiu para 52"],
+                    ["Proposta aceita", "Grupo Vertex · R$ 184 mil"],
+                  ].map(([t, d]) => (
+                    <div key={t} className="rounded-lg px-2.5 py-2 transition-colors hover:bg-muted">
+                      <p className="text-sm">{t}</p>
+                      <p className="text-[11px] text-muted-foreground">{d}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </div>
             <button className="inline-flex items-center gap-2 rounded-xl bg-primary px-3.5 py-2.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90">
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Nova ação</span>
@@ -264,9 +330,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
+      {searchOpen || notifOpen ? (
+        <div
+          className="overlay-dim fixed inset-0 z-30"
+          onClick={() => {
+            setSearchOpen(false);
+            setNotifOpen(false);
+          }}
+        />
+      ) : null}
+
       <div className="flex">
         <aside
-          className="sticky top-16 hidden h-[calc(100vh-4rem)] shrink-0 border-r border-border bg-sidebar lg:block"
+          className="sticky top-20 hidden h-[calc(100vh-5rem)] shrink-0 border-r border-border bg-sidebar lg:block"
           style={{ width: collapsed ? 76 : 260 }}
         >
           {sidebar}
@@ -305,6 +381,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </main>
       </div>
+
+      <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   );
 }
