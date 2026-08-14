@@ -75,6 +75,8 @@ export function Panel({ className, children }: { className?: string; children: R
 }
 
 export function StatCard({
+  ...(() => [])
+}) {}
   label,
   value,
   delta,
