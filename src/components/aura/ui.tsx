@@ -108,7 +108,11 @@ export function StatCard({
       <div className="relative">
         <div className="flex items-start justify-between gap-3">
           <p className="text-xs font-medium tracking-wide text-muted-foreground">{label}</p>
-          {accent ? <Dot accent={accent} /> : null}
+          {accent ? (
+            <span className={cn("text-[10px] font-medium uppercase tracking-wider", segmentTone[accent])}>
+              {segmentName[accent]}
+            </span>
+          ) : null}
         </div>
         <p className="mt-3 text-2xl font-display font-bold tracking-tight">{value}</p>
         <div className="mt-2 flex items-center gap-2 text-xs">
