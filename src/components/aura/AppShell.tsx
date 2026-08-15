@@ -69,7 +69,7 @@ function Logo({ collapsed }: { collapsed: boolean }) {
     <img
       src={theme === "dark" ? logoLight.url : logoDark.url}
       alt="Aura Vector"
-      className="h-[72px] w-auto max-w-full object-contain object-left"
+      className="h-20 w-auto max-w-full object-contain object-left"
     />
   );
 }
@@ -204,7 +204,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
       <header className="glass-header sticky top-0 z-40">
-        <div className="flex h-20 items-center gap-3 px-4 sm:px-6">
+        <div className="flex h-[88px] items-center gap-3 px-4 sm:px-6">
           <button
             className="rounded-lg p-2 hover:bg-muted lg:hidden"
             onClick={() => setMobileOpen(true)}
@@ -215,7 +215,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <Link
             to="/"
             className="hidden items-center lg:flex"
-            style={{ width: collapsed ? 52 : 232 }}
+            style={{ width: collapsed ? 60 : 300 }}
           >
             <Logo collapsed={collapsed} />
           </Link>
@@ -342,7 +342,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex">
         <aside
-          className="sticky top-20 hidden h-[calc(100vh-5rem)] shrink-0 border-r border-border bg-sidebar lg:block"
+          className="sticky top-[88px] hidden h-[calc(100vh-88px)] shrink-0 border-r border-border bg-sidebar lg:block"
           style={{ width: collapsed ? 76 : 260 }}
         >
           {sidebar}
