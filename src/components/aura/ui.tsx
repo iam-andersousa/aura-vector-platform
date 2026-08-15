@@ -119,8 +119,11 @@ export function StatCard({
   accent?: "mkt" | "sales" | "cs";
   trend?: number[];
 }) {
+  const [open, setOpen] = useState(false);
+  const series = trend ?? [12, 18, 15, 22, 26, 24, 31];
   return (
-    <div className="surface relative overflow-hidden p-5">
+    <>
+    <div className="surface group relative overflow-hidden p-5">
       {trend ? (
         <div className="pointer-events-none absolute inset-y-0 right-0 w-[62%]">
           <MiniTrend data={trend} up={up !== false} />
@@ -136,18 +139,13 @@ export function StatCard({
       <div className="relative">
         <div className="flex items-start justify-between gap-3">
           <p className="text-xs font-medium tracking-wide text-muted-foreground">{label}</p>
-          {accent ? (
-            <span className={cn("text-[10px] font-medium uppercase tracking-wider", segmentTone[accent])}>
-              {segmentName[accent]}
-            </span>
-          ) : null}
         </div>
-        <p className="mt-3 text-2xl font-display font-bold tracking-tight">{value}</p>
-        <div className="mt-2 flex items-center gap-2 text-xs">
+        <p className="mt-3 text-3xl font-display tracking-tight">{value}</p>
+        <div className="mt-2 flex items-center gap-2 pr-9 text-xs">
           {delta ? (
             <span
               className={cn(
-                "inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-bold",
+                "inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium",
                 up ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive",
               )}
             >
@@ -158,7 +156,105 @@ export function StatCard({
           {hint ? <span className="text-muted-foreground">{hint}</span> : null}
         </div>
       </div>
+      <button
+        onClick={() => setOpen(true)}
+        aria-label={`Ver detalhes de ${label}`}
+        className="absolute bottom-4 right-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+      >
+        <ArrowRight className="h-4 w-4" />
+      </button>
     </div>
+    <MetricModal
+      open={open}
+      onClose={() => setOpen(false)}
+      label={label}
+      value={value}
+      delta={delta}
+      up={up}
+      hint={hint}
+      accent={accent}
+      series={series}
+    />
+    </>
+  );
+}
+
+function MetricModal({
+  open,
+  onClose,
+  label,
+  value,
+  delta,
+  up,
+  hint,
+  accent,
+  series,
+}: {
+  open: boolean;
+  onClose: () => void;
+  label: string;
+  value: string;
+  delta?: string | undefined;
+  up?: boolean | undefined;
+  hint?: string | undefined;
+  accent?: "mkt" | "sales" | "cs" | undefined;
+  series: number[];
+}) {
+  const months = ["Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set"];
+  const data = series.map((v, i) => ({ label: months[i % months.length] ?? `P${i}`, value: v }));
+  const avg = series.reduce((s, v) => s + v, 0) / Math.max(1, series.length);
+  const tone = accent ? `var(--${accent})` : "var(--sales)";
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={label}
+      subtitle={accent ? `Segmento: ${segmentName[accent]}` : "Visão consolidada"}
+    >
+      <div className="flex flex-wrap items-end gap-4">
+        <p className="text-4xl font-display tracking-tight">{value}</p>
+        {delta ? (
+          <span
+            className={cn(
+              "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium",
+              up ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive",
+            )}
+          >
+            {up ? <ArrowUpRight className="h-3.5 w-3.5" /> : <ArrowDownRight className="h-3.5 w-3.5" />}
+            {delta}
+          </span>
+        ) : null}
+        {hint ? <span className="text-xs text-muted-foreground">{hint}</span> : null}
+        {accent ? <Chip tone={accent}>{segmentName[accent]}</Chip> : null}
+      </div>
+      <p className="eyebrow mt-6">Evolução do indicador</p>
+      <div className="mt-2">
+        <TrendArea data={data} color={tone} height={190} />
+      </div>
+      <div className="mt-5 grid grid-cols-3 gap-3">
+        {[
+          ["Média do período", avg.toFixed(1)],
+          ["Máximo", Math.max(...series).toString()],
+          ["Mínimo", Math.min(...series).toString()],
+        ].map(([k, v]) => (
+          <div key={k} className="rounded-xl bg-muted/60 px-3.5 py-3">
+            <p className="text-[11px] text-muted-foreground">{k}</p>
+            <p className="mt-1 text-lg font-display">{v}</p>
+          </div>
+        ))}
+      </div>
+      <div className="mt-5 flex items-start gap-3 rounded-2xl bg-primary/8 p-4">
+        <VectorIcon className="mt-0.5 h-5 w-5 shrink-0" />
+        <div>
+          <p className="text-sm font-medium">Leitura do Vector</p>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+            {up === false
+              ? `${label} está abaixo da média do período (${avg.toFixed(1)}). Recomendo revisar as etapas com maior tempo de resposta e acionar o responsável da área hoje.`
+              : `${label} segue acima da média do período (${avg.toFixed(1)}). Mantenha o ritmo atual e replique a prática nas contas de mesmo perfil.`}
+          </p>
+        </div>
+      </div>
+    </Modal>
   );
 }
 
