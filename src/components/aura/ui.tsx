@@ -438,34 +438,27 @@ export function Chip({
   );
 }
 
-export function AiCard({
+/**
+ * Bloco único de insights do Vector: imagem de fundo com gradiente suave,
+ * ícone oficial no canto superior esquerdo, resumo e seta para o modal
+ * com as ações em formato de checklist.
+ */
+export function InsightsBlock({
   title,
   body,
-  tag,
-  className,
   items,
+  className,
 }: {
   title: string;
   body: string;
-  tag?: string;
+  items: string[];
   className?: string;
-  items?: string[];
 }) {
   const [open, setOpen] = useState(false);
-  const list = items ?? [
-    "Revisar contexto completo do indicador",
-    "Acionar o responsável pela área",
-    "Registrar decisão na jornada do stakeholder",
-  ];
+  const [done, setDone] = useState<string[]>([]);
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className={cn(
-          "group relative h-full overflow-hidden rounded-2xl text-left transition-transform hover:-translate-y-0.5",
-          className,
-        )}
-      >
+      <div className={cn("relative overflow-hidden rounded-2xl", className)}>
         <img
           src={aiBg.url}
           alt=""
@@ -476,47 +469,60 @@ export function AiCard({
           className="absolute inset-0"
           style={{
             backgroundImage:
-              "linear-gradient(180deg, oklch(0.16 0.03 265 / 25%) 0%, oklch(0.14 0.03 265 / 72%) 55%, oklch(0.12 0.02 265 / 92%) 100%)",
+              "linear-gradient(180deg, oklch(0.18 0.03 265 / 18%) 0%, oklch(0.16 0.03 265 / 46%) 60%, oklch(0.14 0.02 265 / 66%) 100%)",
           }}
         />
-        <div className="relative flex h-full flex-col p-5">
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white">
-              <StarMark className="h-5 w-5" />
-            </span>
-            {tag ? (
-              <span className="rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur">
-                {tag}
-              </span>
-            ) : null}
+        <div className="relative flex flex-col gap-5 p-6 sm:p-7">
+          <VectorIcon onDark className="h-8 w-8" />
+          <div className="max-w-2xl">
+            <p className="text-xl font-display leading-snug text-white sm:text-2xl">{title}</p>
+            <p className="mt-2 text-sm leading-relaxed text-white/85">{body}</p>
           </div>
-          <p className="mt-8 text-sm font-display font-bold leading-snug text-white">{title}</p>
-          <p className="mt-2 text-xs leading-relaxed text-white/75">{body}</p>
-          <span className="mt-4 text-[11px] font-medium text-white/70 group-hover:text-white">
-            Ver recomendações →
-          </span>
+          <button
+            onClick={() => setOpen(true)}
+            aria-label="Ver insights em detalhes"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur transition-colors hover:bg-white/35"
+          >
+            <ArrowRight className="h-4 w-4" />
+          </button>
         </div>
-      </button>
+      </div>
       <Modal
         open={open}
         onClose={() => setOpen(false)}
         title={title}
-        subtitle={tag ? `Vector · ${tag}` : "Vector"}
+        subtitle="Insights e ações recomendadas pelo Vector"
       >
         <p className="text-sm leading-relaxed text-muted-foreground">{body}</p>
-        <p className="eyebrow mt-6">Recomendações e insights</p>
-        <ul className="mt-3 space-y-2.5">
-          {list.map((i) => (
-            <li
-              key={i}
-              className="flex items-start gap-3 rounded-xl bg-muted/60 px-3.5 py-3 text-sm"
-            >
-              <span className="mt-0.5 text-primary">
-                <StarMark className="h-3.5 w-3.5" />
-              </span>
-              <span>{i}</span>
-            </li>
-          ))}
+        <p className="eyebrow mt-6">Checklist de ações</p>
+        <ul className="mt-3 space-y-2">
+          {items.map((i) => {
+            const checked = done.includes(i);
+            return (
+              <li key={i}>
+                <button
+                  onClick={() =>
+                    setDone((p) => (checked ? p.filter((x) => x !== i) : [...p, i]))
+                  }
+                  className="flex w-full items-start gap-3 rounded-xl bg-muted/60 px-3.5 py-3 text-left text-sm transition-colors hover:bg-muted"
+                >
+                  <span
+                    className={cn(
+                      "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-[5px] border",
+                      checked
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border",
+                    )}
+                  >
+                    {checked ? <Check className="h-3 w-3" /> : null}
+                  </span>
+                  <span className={checked ? "text-muted-foreground line-through" : undefined}>
+                    {i}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </Modal>
     </>
