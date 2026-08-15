@@ -1,4 +1,4 @@
-import { ArrowDownRight, ArrowUpRight, CalendarDays, Check, Tag, X } from "lucide-react";
+import { ArrowDownRight, ArrowRight, ArrowUpRight, CalendarDays, Check, Tag, X } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import {
   Area,
@@ -19,6 +19,9 @@ import {
 } from "recharts";
 
 import aiBg from "@/assets/ai-gradient-bg.png.asset.json";
+import vectorIconDark from "@/assets/vector-icon-dark.png.asset.json";
+import vectorIconLight from "@/assets/vector-icon-light.png.asset.json";
+import { useTheme } from "@/components/aura/theme";
 import { cn } from "@/lib/utils";
 
 export function StarMark({ className }: { className?: string }) {
@@ -30,6 +33,19 @@ export function StarMark({ className }: { className?: string }) {
       />
     </svg>
   );
+}
+
+/** Ícone oficial do Vector. `onDark` força a versão clara. */
+export function VectorIcon({
+  className,
+  onDark = false,
+}: {
+  className?: string;
+  onDark?: boolean;
+}) {
+  const { theme } = useTheme();
+  const src = onDark || theme === "dark" ? vectorIconLight.url : vectorIconDark.url;
+  return <img src={src} alt="Vector" className={cn("h-6 w-6 object-contain", className)} />;
 }
 
 export function PageHeader({
@@ -46,8 +62,8 @@ export function PageHeader({
   return (
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div className="max-w-2xl">
-        <p className="eyebrow">{eyebrow}</p>
-        <h1 className="mt-2 text-3xl font-display sm:text-4xl">{title}</h1>
+        <p className="text-sm text-muted-foreground">{title}</p>
+        <h1 className="mt-1.5 text-3xl font-display sm:text-4xl">{eyebrow}</h1>
         {subtitle ? <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p> : null}
       </div>
       {children ? <div className="flex flex-wrap gap-2">{children}</div> : null}
