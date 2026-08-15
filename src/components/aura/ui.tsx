@@ -1,4 +1,4 @@
-import { ArrowDownRight, ArrowUpRight, CalendarDays, Check, Tag, X } from "lucide-react";
+import { ArrowDownRight, ArrowRight, ArrowUpRight, CalendarDays, Check, Tag, X } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import {
   Area,
@@ -19,6 +19,9 @@ import {
 } from "recharts";
 
 import aiBg from "@/assets/ai-gradient-bg.png.asset.json";
+import vectorIconDark from "@/assets/vector-icon-dark.png.asset.json";
+import vectorIconLight from "@/assets/vector-icon-light.png.asset.json";
+import { useTheme } from "@/components/aura/theme";
 import { cn } from "@/lib/utils";
 
 export function StarMark({ className }: { className?: string }) {
@@ -30,6 +33,19 @@ export function StarMark({ className }: { className?: string }) {
       />
     </svg>
   );
+}
+
+/** Ícone oficial do Vector. `onDark` força a versão clara. */
+export function VectorIcon({
+  className,
+  onDark = false,
+}: {
+  className?: string;
+  onDark?: boolean;
+}) {
+  const { theme } = useTheme();
+  const src = onDark || theme === "dark" ? vectorIconLight.url : vectorIconDark.url;
+  return <img src={src} alt="Vector" className={cn("h-6 w-6 object-contain", className)} />;
 }
 
 export function PageHeader({
@@ -46,8 +62,8 @@ export function PageHeader({
   return (
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div className="max-w-2xl">
-        <p className="eyebrow">{eyebrow}</p>
-        <h1 className="mt-2 text-3xl font-display sm:text-4xl">{title}</h1>
+        <p className="text-sm text-muted-foreground">{title}</p>
+        <h1 className="mt-1.5 text-3xl font-display sm:text-4xl">{eyebrow}</h1>
         {subtitle ? <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p> : null}
       </div>
       {children ? <div className="flex flex-wrap gap-2">{children}</div> : null}
@@ -103,8 +119,11 @@ export function StatCard({
   accent?: "mkt" | "sales" | "cs";
   trend?: number[];
 }) {
+  const [open, setOpen] = useState(false);
+  const series = trend ?? [12, 18, 15, 22, 26, 24, 31];
   return (
-    <div className="surface relative overflow-hidden p-5">
+    <>
+    <div className="surface group relative overflow-hidden p-5">
       {trend ? (
         <div className="pointer-events-none absolute inset-y-0 right-0 w-[62%]">
           <MiniTrend data={trend} up={up !== false} />
@@ -120,18 +139,13 @@ export function StatCard({
       <div className="relative">
         <div className="flex items-start justify-between gap-3">
           <p className="text-xs font-medium tracking-wide text-muted-foreground">{label}</p>
-          {accent ? (
-            <span className={cn("text-[10px] font-medium uppercase tracking-wider", segmentTone[accent])}>
-              {segmentName[accent]}
-            </span>
-          ) : null}
         </div>
-        <p className="mt-3 text-2xl font-display font-bold tracking-tight">{value}</p>
-        <div className="mt-2 flex items-center gap-2 text-xs">
+        <p className="mt-3 text-3xl font-display tracking-tight">{value}</p>
+        <div className="mt-2 flex items-center gap-2 pr-9 text-xs">
           {delta ? (
             <span
               className={cn(
-                "inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-bold",
+                "inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium",
                 up ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive",
               )}
             >
@@ -142,7 +156,105 @@ export function StatCard({
           {hint ? <span className="text-muted-foreground">{hint}</span> : null}
         </div>
       </div>
+      <button
+        onClick={() => setOpen(true)}
+        aria-label={`Ver detalhes de ${label}`}
+        className="absolute bottom-4 right-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+      >
+        <ArrowRight className="h-4 w-4" />
+      </button>
     </div>
+    <MetricModal
+      open={open}
+      onClose={() => setOpen(false)}
+      label={label}
+      value={value}
+      delta={delta}
+      up={up}
+      hint={hint}
+      accent={accent}
+      series={series}
+    />
+    </>
+  );
+}
+
+function MetricModal({
+  open,
+  onClose,
+  label,
+  value,
+  delta,
+  up,
+  hint,
+  accent,
+  series,
+}: {
+  open: boolean;
+  onClose: () => void;
+  label: string;
+  value: string;
+  delta?: string | undefined;
+  up?: boolean | undefined;
+  hint?: string | undefined;
+  accent?: "mkt" | "sales" | "cs" | undefined;
+  series: number[];
+}) {
+  const months = ["Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set"];
+  const data = series.map((v, i) => ({ label: months[i % months.length] ?? `P${i}`, value: v }));
+  const avg = series.reduce((s, v) => s + v, 0) / Math.max(1, series.length);
+  const tone = accent ? `var(--${accent})` : "var(--sales)";
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={label}
+      subtitle={accent ? `Segmento: ${segmentName[accent]}` : "Visão consolidada"}
+    >
+      <div className="flex flex-wrap items-end gap-4">
+        <p className="text-4xl font-display tracking-tight">{value}</p>
+        {delta ? (
+          <span
+            className={cn(
+              "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium",
+              up ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive",
+            )}
+          >
+            {up ? <ArrowUpRight className="h-3.5 w-3.5" /> : <ArrowDownRight className="h-3.5 w-3.5" />}
+            {delta}
+          </span>
+        ) : null}
+        {hint ? <span className="text-xs text-muted-foreground">{hint}</span> : null}
+        {accent ? <Chip tone={accent}>{segmentName[accent]}</Chip> : null}
+      </div>
+      <p className="eyebrow mt-6">Evolução do indicador</p>
+      <div className="mt-2">
+        <TrendArea data={data} color={tone} height={190} />
+      </div>
+      <div className="mt-5 grid grid-cols-3 gap-3">
+        {[
+          ["Média do período", avg.toFixed(1)],
+          ["Máximo", Math.max(...series).toString()],
+          ["Mínimo", Math.min(...series).toString()],
+        ].map(([k, v]) => (
+          <div key={k} className="rounded-xl bg-muted/60 px-3.5 py-3">
+            <p className="text-[11px] text-muted-foreground">{k}</p>
+            <p className="mt-1 text-lg font-display">{v}</p>
+          </div>
+        ))}
+      </div>
+      <div className="mt-5 flex items-start gap-3 rounded-2xl bg-primary/8 p-4">
+        <VectorIcon className="mt-0.5 h-5 w-5 shrink-0" />
+        <div>
+          <p className="text-sm font-medium">Leitura do Vector</p>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+            {up === false
+              ? `${label} está abaixo da média do período (${avg.toFixed(1)}). Recomendo revisar as etapas com maior tempo de resposta e acionar o responsável da área hoje.`
+              : `${label} segue acima da média do período (${avg.toFixed(1)}). Mantenha o ritmo atual e replique a prática nas contas de mesmo perfil.`}
+          </p>
+        </div>
+      </div>
+    </Modal>
   );
 }
 
@@ -326,34 +438,27 @@ export function Chip({
   );
 }
 
-export function AiCard({
+/**
+ * Bloco único de insights do Vector: imagem de fundo com gradiente suave,
+ * ícone oficial no canto superior esquerdo, resumo e seta para o modal
+ * com as ações em formato de checklist.
+ */
+export function InsightsBlock({
   title,
   body,
-  tag,
-  className,
   items,
+  className,
 }: {
   title: string;
   body: string;
-  tag?: string;
+  items: string[];
   className?: string;
-  items?: string[];
 }) {
   const [open, setOpen] = useState(false);
-  const list = items ?? [
-    "Revisar contexto completo do indicador",
-    "Acionar o responsável pela área",
-    "Registrar decisão na jornada do stakeholder",
-  ];
+  const [done, setDone] = useState<string[]>([]);
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className={cn(
-          "group relative h-full overflow-hidden rounded-2xl text-left transition-transform hover:-translate-y-0.5",
-          className,
-        )}
-      >
+      <div className={cn("relative overflow-hidden rounded-2xl", className)}>
         <img
           src={aiBg.url}
           alt=""
@@ -364,47 +469,60 @@ export function AiCard({
           className="absolute inset-0"
           style={{
             backgroundImage:
-              "linear-gradient(180deg, oklch(0.16 0.03 265 / 25%) 0%, oklch(0.14 0.03 265 / 72%) 55%, oklch(0.12 0.02 265 / 92%) 100%)",
+              "linear-gradient(180deg, oklch(0.18 0.03 265 / 18%) 0%, oklch(0.16 0.03 265 / 46%) 60%, oklch(0.14 0.02 265 / 66%) 100%)",
           }}
         />
-        <div className="relative flex h-full flex-col p-5">
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white">
-              <StarMark className="h-5 w-5" />
-            </span>
-            {tag ? (
-              <span className="rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur">
-                {tag}
-              </span>
-            ) : null}
+        <div className="relative flex flex-col gap-5 p-6 sm:p-7">
+          <VectorIcon onDark className="h-8 w-8" />
+          <div className="max-w-2xl">
+            <p className="text-xl font-display leading-snug text-white sm:text-2xl">{title}</p>
+            <p className="mt-2 text-sm leading-relaxed text-white/85">{body}</p>
           </div>
-          <p className="mt-8 text-sm font-display font-bold leading-snug text-white">{title}</p>
-          <p className="mt-2 text-xs leading-relaxed text-white/75">{body}</p>
-          <span className="mt-4 text-[11px] font-medium text-white/70 group-hover:text-white">
-            Ver recomendações →
-          </span>
+          <button
+            onClick={() => setOpen(true)}
+            aria-label="Ver insights em detalhes"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur transition-colors hover:bg-white/35"
+          >
+            <ArrowRight className="h-4 w-4" />
+          </button>
         </div>
-      </button>
+      </div>
       <Modal
         open={open}
         onClose={() => setOpen(false)}
         title={title}
-        subtitle={tag ? `Vector · ${tag}` : "Vector"}
+        subtitle="Insights e ações recomendadas pelo Vector"
       >
         <p className="text-sm leading-relaxed text-muted-foreground">{body}</p>
-        <p className="eyebrow mt-6">Recomendações e insights</p>
-        <ul className="mt-3 space-y-2.5">
-          {list.map((i) => (
-            <li
-              key={i}
-              className="flex items-start gap-3 rounded-xl bg-muted/60 px-3.5 py-3 text-sm"
-            >
-              <span className="mt-0.5 text-primary">
-                <StarMark className="h-3.5 w-3.5" />
-              </span>
-              <span>{i}</span>
-            </li>
-          ))}
+        <p className="eyebrow mt-6">Checklist de ações</p>
+        <ul className="mt-3 space-y-2">
+          {items.map((i) => {
+            const checked = done.includes(i);
+            return (
+              <li key={i}>
+                <button
+                  onClick={() =>
+                    setDone((p) => (checked ? p.filter((x) => x !== i) : [...p, i]))
+                  }
+                  className="flex w-full items-start gap-3 rounded-xl bg-muted/60 px-3.5 py-3 text-left text-sm transition-colors hover:bg-muted"
+                >
+                  <span
+                    className={cn(
+                      "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-[5px] border",
+                      checked
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border",
+                    )}
+                  >
+                    {checked ? <Check className="h-3 w-3" /> : null}
+                  </span>
+                  <span className={checked ? "text-muted-foreground line-through" : undefined}>
+                    {i}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </Modal>
     </>
