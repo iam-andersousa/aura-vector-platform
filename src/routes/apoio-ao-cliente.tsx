@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { AlertOctagon } from "lucide-react";
+import { AlertOctagon, ArrowUpDown } from "lucide-react";
 
 import {
-  AiCard,
   Chip,
   Gauge,
+  InsightsBlock,
   HealthDots,
   AnalyticsFilters,
   PageHeader,
@@ -16,6 +16,8 @@ import {
   StatCard,
 } from "@/components/aura/ui";
 import { accounts } from "@/lib/aura-data";
+
+type AccountSort = "health" | "tickets" | "sla" | "nps";
 
 export const Route = createFileRoute("/apoio-ao-cliente")({
   head: () => ({
@@ -44,9 +46,47 @@ const riskTone: Record<string, "danger" | "warning" | "success"> = {
 
 function ApoioPage() {
   const [period, setPeriod] = useState<string>("Este mês");
-  const [sector, setSector] = useState<string>("Todos");
+  const [sort, setSort] = useState<{ key: AccountSort; dir: "asc" | "desc" }>({
+    key: "health",
+    dir: "asc",
+  });
+  const setPagePeriod = (value: string) => {
+    setPeriod(value);
+  };
   const filters = (
-    <AnalyticsFilters period={period} onPeriod={setPeriod} sector={sector} onSector={setSector} />
+    <AnalyticsFilters
+      period={period}
+      onPeriod={setPagePeriod}
+      sector="Todos"
+      onSector={() => undefined}
+      showSector={false}
+    />
+  );
+  const timeFilter = (value: string, onChange: (v: string) => void) => (
+    <AnalyticsFilters
+      period={value}
+      onPeriod={onChange}
+      sector="Todos"
+      onSector={() => undefined}
+      showSector={false}
+    />
+  );
+  const sortedAccounts = [...accounts].sort((a, b) => {
+    const read = (account: (typeof accounts)[number]) =>
+      sort.key === "sla" ? Number(account.sla.replace("%", "")) : account[sort.key];
+    const delta = Number(read(a)) - Number(read(b));
+    return sort.dir === "asc" ? delta : -delta;
+  });
+  const sortButton = (key: AccountSort, label: string) => (
+    <button
+      onClick={() =>
+        setSort((s) => ({ key, dir: s.key === key && s.dir === "desc" ? "asc" : "desc" }))
+      }
+      className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground"
+    >
+      {label}
+      <ArrowUpDown className="h-3 w-3" />
+    </button>
   );
   return (
     <>
@@ -60,7 +100,14 @@ function ApoioPage() {
       </PageHeader>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Clientes ativos" value="132" delta="+6" up accent="cs" />
+        <StatCard
+          label="Clientes ativos"
+          value="132"
+          delta="+6"
+          up
+          accent="cs"
+          modalFilters={filters}
+        />
         <StatCard
           label="Tickets abertos"
           value="48"
@@ -68,14 +115,23 @@ function ApoioPage() {
           up
           hint="13 críticos"
           accent="cs"
+          modalFilters={filters}
         />
-        <StatCard label="SLA de resposta" value="93%" delta="+2,4%" up accent="cs" />
+        <StatCard
+          label="SLA de resposta"
+          value="93%"
+          delta="+2,4%"
+          up
+          accent="cs"
+          modalFilters={filters}
+        />
         <StatCard
           label="Risco de churn"
           value="7 contas"
           delta="+2"
           hint="R$ 1,1M em ARR"
           accent="cs"
+          modalFilters={filters}
         />
       </section>
 
@@ -99,16 +155,38 @@ function ApoioPage() {
             ))}
           </div>
         </Panel>
-        <Panel>
-          <SectionTitle>NPS / CSAT</SectionTitle>
-          <div className="flex items-center gap-8">
-            <Gauge value={54} label="NPS" tone="var(--cs)" />
-            <Gauge value={87} label="CSAT" tone="var(--sales)" />
-          </div>
-          <p className="mt-4 text-xs text-muted-foreground">
-            Promotores: 62% · Neutros: 30% · Detratores: 8%
-          </p>
-        </Panel>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+          <Panel>
+            <SectionTitle>NPS</SectionTitle>
+            <Gauge value={54} label="score atual" tone="var(--cs)" />
+            <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
+              {[
+                ["Promotores", "62%"],
+                ["Neutros", "30%"],
+                ["Detratores", "8%"],
+              ].map(([k, v]) => (
+                <div key={k} className="rounded-xl bg-muted/60 px-2 py-2">
+                  <p className="font-medium">{v}</p>
+                  <p className="mt-0.5 text-[10px] text-muted-foreground">{k}</p>
+                </div>
+              ))}
+            </div>
+          </Panel>
+          <Panel>
+            <SectionTitle>CSAT</SectionTitle>
+            <Gauge value={87} label="satisfação" tone="var(--sales)" />
+            <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+              <div className="rounded-xl bg-muted/60 px-3 py-2">
+                <p className="font-medium">4,6/5</p>
+                <p className="mt-0.5 text-[10px] text-muted-foreground">Nota média</p>
+              </div>
+              <div className="rounded-xl bg-muted/60 px-3 py-2">
+                <p className="font-medium">312</p>
+                <p className="mt-0.5 text-[10px] text-muted-foreground">Respostas</p>
+              </div>
+            </div>
+          </Panel>
+        </div>
         <Panel>
           <SectionTitle>Solicitações recorrentes</SectionTitle>
           <div className="space-y-4">
@@ -138,15 +216,17 @@ function ApoioPage() {
           <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr className="border-b border-border text-left text-[11px] uppercase tracking-wider text-muted-foreground">
-                {["Conta", "Health", "Tickets", "SLA", "NPS", "Etapa", "Risco"].map((h) => (
-                  <th key={h} className="py-3 font-medium">
-                    {h}
-                  </th>
-                ))}
+                <th className="py-3 font-medium">Conta</th>
+                <th className="py-3 font-medium">{sortButton("health", "Health")}</th>
+                <th className="py-3 font-medium">{sortButton("tickets", "Tickets")}</th>
+                <th className="py-3 font-medium">{sortButton("sla", "SLA")}</th>
+                <th className="py-3 font-medium">{sortButton("nps", "NPS")}</th>
+                <th className="py-3 font-medium">Etapa</th>
+                <th className="py-3 font-medium">Risco</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {accounts.map((a) => (
+              {sortedAccounts.map((a) => (
                 <tr key={a.company} className="transition-colors hover:bg-muted/40">
                   <td className="py-4 font-medium">{a.company}</td>
                   <td className="py-4">
@@ -206,18 +286,15 @@ function ApoioPage() {
             color="var(--cs)"
           />
         </Panel>
-        <div className="grid gap-4">
-          <AiCard
-            tag="Retenção"
-            title="Plano de resgate para Nova Lima Tech"
-            body="Agendar QBR com sponsor, revisar adoção do módulo de relatórios e oferecer trilha de treinamento."
-          />
-          <AiCard
-            tag="Expansão"
-            title="Delta Agro pronto para upsell"
-            body="Health 88 e uso acima do plano contratado — oportunidade de +2 squads."
-          />
-        </div>
+        <InsightsBlock
+          title="Proteger contas criticas e abrir espaco para expansao"
+          body="Vector recomenda um plano de resgate para Nova Lima Tech e uma abordagem de upsell para Delta Agro."
+          items={[
+            "Agendar QBR com sponsor da Nova Lima Tech e revisar adocao do modulo de relatorios.",
+            "Oferecer trilha de treinamento para reduzir tickets recorrentes.",
+            "Abrir oportunidade de +2 squads para Delta Agro pelo uso acima do plano contratado.",
+          ]}
+        />
       </section>
     </>
   );

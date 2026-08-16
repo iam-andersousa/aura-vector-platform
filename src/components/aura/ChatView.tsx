@@ -1,10 +1,10 @@
 import {
   ArrowUp,
-  Bot,
   Check,
   ChevronDown,
   Coins,
   Gauge,
+  Mic,
   Paperclip,
   Plug,
   Plus,
@@ -14,11 +14,12 @@ import {
 import { useEffect, useRef, useState } from "react";
 
 import profilePic from "@/assets/profile-user.png.asset.json";
-import { StarMark } from "@/components/aura/ui";
+import { VectorIcon, VectorSurface } from "@/components/aura/ui";
 import { integrations } from "@/lib/aura-data";
 import { cn } from "@/lib/utils";
 
 type Msg = { id: number; role: "user" | "assistant"; text: string };
+export type UserProfile = { name: string; email: string; role: string; avatar: string };
 
 const suggestions = [
   "Quais contas estão em risco de churn esta semana?",
@@ -88,7 +89,16 @@ function Popover({
   );
 }
 
-export function ChatView() {
+export function ChatView({
+  userProfile = {
+    name: "Marina Souza",
+    email: "marina@auravector.com",
+    role: "Head de RevOps",
+    avatar: profilePic.url,
+  },
+}: {
+  userProfile?: UserProfile;
+}) {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [mode, setMode] = useState<string>("foco");
@@ -100,6 +110,8 @@ export function ChatView() {
   const fileRef = useRef<HTMLInputElement>(null);
   const taRef = useRef<HTMLTextAreaElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const selectedMode = modes.find((m) => m.id === mode) ?? modes[0];
+  const hasInput = input.trim().length > 0;
 
   useEffect(() => {
     taRef.current?.focus();
@@ -135,7 +147,7 @@ export function ChatView() {
         {messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center text-center">
             <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <StarMark className="h-6 w-6" />
+              <VectorIcon className="h-7 w-7" />
             </span>
             <h2 className="mt-5 text-2xl font-display">Como posso ajudar hoje?</h2>
             <p className="mt-2 max-w-md text-sm text-muted-foreground">
@@ -163,17 +175,19 @@ export function ChatView() {
                     {m.text}
                   </p>
                   <img
-                    src={profilePic.url}
-                    alt=""
+                    src={userProfile.avatar}
+                    alt={userProfile.name}
                     className="h-8 w-8 shrink-0 rounded-full object-cover"
                   />
                 </div>
               ) : (
                 <div key={m.id} className="flex gap-3">
-                  <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <StarMark className="h-4 w-4" />
+                  <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-black/85">
+                    <VectorIcon onDark className="h-5 w-5" />
                   </span>
-                  <p className="max-w-[85%] text-sm leading-relaxed text-foreground">{m.text}</p>
+                  <VectorSurface className="max-w-[85%]" contentClassName="p-3.5">
+                    <p className="text-sm leading-relaxed text-white/90">{m.text}</p>
+                  </VectorSurface>
                 </div>
               ),
             )}
@@ -259,7 +273,7 @@ export function ChatView() {
             </div>
           </Popover>
 
-          <Popover label={modes.find((m) => m.id === mode)?.label ?? "Modo"} icon={Bot}>
+          <Popover label={selectedMode.label} icon={selectedMode.icon}>
             {modes.map((m) => (
               <button
                 key={m.id}
@@ -284,8 +298,8 @@ export function ChatView() {
           </Popover>
 
           <Popover
-            label={tokenMode === "auto" ? "Tokenomics: automático" : "Tokenomics: manual"}
-            icon={Sliders}
+            label={tokenMode === "auto" ? "Tokenomics: automatico" : "Tokenomics: manual"}
+            icon={tokenMode === "auto" ? Coins : Sliders}
           >
             <div className="space-y-2 p-1">
               <button
@@ -359,11 +373,15 @@ export function ChatView() {
 
           <button
             onClick={() => send(input)}
-            disabled={!input.trim()}
-            aria-label="Enviar mensagem"
-            className="ml-auto flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
+            aria-label={hasInput ? "Enviar mensagem" : "Gravar audio"}
+            className={cn(
+              "ml-auto flex h-9 w-9 items-center justify-center rounded-full transition-colors",
+              hasInput
+                ? "bg-primary text-primary-foreground hover:opacity-90"
+                : "bg-muted text-muted-foreground hover:text-foreground",
+            )}
           >
-            <ArrowUp className="h-4 w-4" />
+            {hasInput ? <ArrowUp className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
           </button>
         </div>
       </div>

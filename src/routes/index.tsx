@@ -1,12 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 
+import aiBg from "@/assets/aura-vector-background.png";
 import {
-  AiCard,
   AnalyticsFilters,
   Chip,
   Donut,
+  InsightsBlock,
   Panel,
   PageHeader,
   ProgressBar,
@@ -14,6 +15,7 @@ import {
   SectionTitle,
   StatCard,
   TrendArea,
+  VectorIcon,
 } from "@/components/aura/ui";
 import { aiInsights, funnel, kpis, nextActions } from "@/lib/aura-data";
 
@@ -55,8 +57,36 @@ const areaTone: Record<string, "mkt" | "sales" | "cs"> = {
 function CommandCenter() {
   const [period, setPeriod] = useState<string>("Este mês");
   const [sector, setSector] = useState<string>("Todos");
+  const [kpiPeriod, setKpiPeriod] = useState<string | null>(null);
+  const [revenuePeriod, setRevenuePeriod] = useState<string | null>(null);
+  const [funnelPeriod, setFunnelPeriod] = useState<string | null>(null);
+  const [leadsPeriod, setLeadsPeriod] = useState<string | null>(null);
+  const [cyclePeriod, setCyclePeriod] = useState<string | null>(null);
+
+  const setPagePeriod = (value: string) => {
+    setPeriod(value);
+    setKpiPeriod(null);
+    setRevenuePeriod(null);
+    setFunnelPeriod(null);
+    setLeadsPeriod(null);
+    setCyclePeriod(null);
+  };
   const filters = (
-    <AnalyticsFilters period={period} onPeriod={setPeriod} sector={sector} onSector={setSector} />
+    <AnalyticsFilters
+      period={period}
+      onPeriod={setPagePeriod}
+      sector={sector}
+      onSector={setSector}
+    />
+  );
+  const timeFilter = (value: string, onChange: (v: string) => void) => (
+    <AnalyticsFilters
+      period={value}
+      onPeriod={onChange}
+      sector="Todos"
+      onSector={() => undefined}
+      showSector={false}
+    />
   );
 
   const visibleKpis = kpis.filter((k) => sector === "Todos" || k.area === sector);
@@ -74,16 +104,22 @@ function CommandCenter() {
           to="/jornada"
           className="inline-flex items-center gap-2 rounded-xl bg-primary px-3.5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90"
         >
-          Ver jornada 360
+          Ver jornada
           <ArrowRight className="h-4 w-4" />
         </Link>
       </PageHeader>
 
       <section>
-        <SectionTitle action={filters}>Indicadores da operação</SectionTitle>
+        <SectionTitle action={timeFilter(kpiPeriod ?? period, setKpiPeriod)}>
+          Indicadores da operação
+        </SectionTitle>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {visibleKpis.map((k) => (
-            <StatCard key={k.label} {...k} />
+            <StatCard
+              key={k.label}
+              {...k}
+              modalFilters={timeFilter(kpiPeriod ?? period, setKpiPeriod)}
+            />
           ))}
         </div>
       </section>
@@ -92,20 +128,27 @@ function CommandCenter() {
         <SectionTitle action={<Chip tone="sales">Camada de apoio à decisão</Chip>}>
           Inteligência artificial
         </SectionTitle>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {visibleInsights.map((i) => (
-            <AiCard key={i.title} title={i.title} body={i.body} tag={i.tag} items={i.actions} />
-          ))}
-        </div>
+        <InsightsBlock
+          title={visibleInsights[0]?.title ?? "Prioridades do Vector para este periodo"}
+          body={
+            visibleInsights[0]?.body ??
+            "Acompanhe gargalos de receita, risco de churn e proximas acoes em uma unica leitura."
+          }
+          items={visibleInsights.flatMap((i) => i.actions)}
+        />
       </section>
 
       <section className="grid gap-4 lg:grid-cols-3">
         <Panel className="lg:col-span-2">
-          <SectionTitle action={filters}>Receita influenciada por mês</SectionTitle>
+          <SectionTitle action={timeFilter(revenuePeriod ?? period, setRevenuePeriod)}>
+            Receita influenciada por mês
+          </SectionTitle>
           <TrendArea data={revenueTrend} />
         </Panel>
         <Panel>
-          <SectionTitle action={filters}>Conversão por etapa</SectionTitle>
+          <SectionTitle action={timeFilter(funnelPeriod ?? period, setFunnelPeriod)}>
+            Conversão por etapa
+          </SectionTitle>
           <div className="space-y-4">
             {funnel.map((f) => (
               <div key={f.stage}>
@@ -146,9 +189,16 @@ function CommandCenter() {
                   </p>
                 </div>
                 <Chip tone={areaTone[a.area] ?? "neutral"}>{a.area}</Chip>
-                <button className="inline-flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground">
-                  <Sparkles className="h-3 w-3" />
-                  Ver contexto
+                <button className="relative inline-flex items-center gap-1.5 overflow-hidden rounded-lg px-2.5 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90">
+                  <img
+                    src={aiBg}
+                    alt=""
+                    aria-hidden
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                  <span className="absolute inset-0 bg-black/35" />
+                  <VectorIcon onDark className="relative h-3 w-3" />
+                  <span className="relative">Ver contexto</span>
                 </button>
               </div>
             ))}
@@ -158,7 +208,9 @@ function CommandCenter() {
 
       <section className="grid gap-4 lg:grid-cols-2">
         <Panel>
-          <SectionTitle action={filters}>Leads por canal</SectionTitle>
+          <SectionTitle action={timeFilter(leadsPeriod ?? period, setLeadsPeriod)}>
+            Leads por canal
+          </SectionTitle>
           <Donut
             centerLabel="leads"
             data={[
@@ -171,7 +223,9 @@ function CommandCenter() {
           />
         </Panel>
         <Panel>
-          <SectionTitle action={filters}>Tempo médio por etapa (dias)</SectionTitle>
+          <SectionTitle action={timeFilter(cyclePeriod ?? period, setCyclePeriod)}>
+            Tempo médio por etapa (dias)
+          </SectionTitle>
           <RoundedBars
             data={[
               { label: "Qualif.", value: 3 },

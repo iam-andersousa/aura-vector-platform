@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ShieldCheck, Sparkles } from "lucide-react";
 
 import {
-  AiCard,
   Chip,
+  InsightsBlock,
   PageHeader,
   Panel,
   ProgressBar,
@@ -15,13 +15,13 @@ import { aiCapabilities } from "@/lib/aura-data";
 export const Route = createFileRoute("/inteligencia-ia")({
   head: () => ({
     meta: [
-      { title: "Inteligência IA — Aura Vector" },
+      { title: "Insights — Aura Vector" },
       {
         name: "description",
         content:
           "Camada de IA para resumo de interações, priorização de leads, risco de churn e detecção de gargalos — sempre com controle humano.",
       },
-      { property: "og:title", content: "Inteligência IA — Aura Vector" },
+      { property: "og:title", content: "Insights — Aura Vector" },
       {
         property: "og:description",
         content: "IA como apoio à decisão, não automação sem controle.",
@@ -35,7 +35,7 @@ function IaPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Inteligência IA"
+        eyebrow="Insights"
         title="Apoio à decisão, com humano no comando."
         subtitle="Toda recomendação vem com contexto, justificativa e aprovação do time responsável."
       >
@@ -70,11 +70,11 @@ function IaPage() {
 
       <section>
         <SectionTitle>Capacidades</SectionTitle>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {aiCapabilities.map((c) => (
-            <AiCard key={c.title} title={c.title} body={c.body} />
-          ))}
-        </div>
+        <InsightsBlock
+          title="Vector transforma sinais dispersos em proximas acoes"
+          body="Resumo de interacoes, priorizacao de leads, risco de churn e deteccao de gargalos aparecem como uma unica camada de decisao."
+          items={aiCapabilities.map((c) => c.title + ": " + c.body)}
+        />
       </section>
 
       <section className="grid gap-4 lg:grid-cols-2">

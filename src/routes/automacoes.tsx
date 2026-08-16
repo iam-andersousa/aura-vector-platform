@@ -2,7 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ArrowRight, Plus, Zap } from "lucide-react";
 import { useState } from "react";
 
-import { AiCard, Chip, PageHeader, Panel, SectionTitle, StatCard } from "@/components/aura/ui";
+import {
+  Chip,
+  InsightsBlock,
+  PageHeader,
+  Panel,
+  SectionTitle,
+  StatCard,
+} from "@/components/aura/ui";
 import { automations } from "@/lib/aura-data";
 
 export const Route = createFileRoute("/automacoes")({
@@ -90,24 +97,16 @@ function AutomacoesPage() {
       </section>
 
       <section>
-        <SectionTitle>Automações sugeridas pela IA</SectionTitle>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          <AiCard
-            tag="Vendas"
-            title="Rodízio inteligente de leads"
-            body="Distribuir leads de alto score para vendedores com melhor win rate no segmento."
-          />
-          <AiCard
-            tag="Apoio ao Cliente"
-            title="Alerta de queda de uso"
-            body="Se o uso cair 30% em 14 dias, criar tarefa de checagem para o CS responsável."
-          />
-          <AiCard
-            tag="Marketing"
-            title="Feedback de qualidade para mídia"
-            body="Enviar semanalmente o score médio por campanha para o time de mídia."
-          />
-        </div>
+        <SectionTitle>Automacoes sugeridas pela IA</SectionTitle>
+        <InsightsBlock
+          title="Criar rotinas para distribuicao, risco e feedback de qualidade"
+          body="Vector recomenda automatizar tarefas que hoje dependem de checagem manual entre vendas, apoio ao cliente e marketing."
+          items={[
+            "Distribuir leads de alto score para vendedores com melhor win rate no segmento.",
+            "Criar alerta se o uso cair 30% em 14 dias para o CS responsavel.",
+            "Enviar semanalmente o score medio por campanha para o time de midia.",
+          ]}
+        />
       </section>
     </>
   );

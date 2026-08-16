@@ -1,8 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Filter, Search } from "lucide-react";
+import { Filter, LayoutGrid, Search, SplitSquareHorizontal } from "lucide-react";
 import { useState } from "react";
 
-import { AiBadge, Chip, HealthDots, Modal, PageHeader, ProgressBar } from "@/components/aura/ui";
+import {
+  Chip,
+  HealthDots,
+  Modal,
+  PageHeader,
+  ProgressBar,
+  VectorSurface,
+} from "@/components/aura/ui";
 import { kanbanCards, kanbanColumns, type Stakeholder } from "@/lib/aura-data";
 
 export const Route = createFileRoute("/kanban")({
@@ -30,6 +37,25 @@ const accentBar: Record<string, string> = {
   cs: "bg-cs",
 };
 
+const accentBorder: Record<string, string> = {
+  mkt: "border-mkt/55",
+  sales: "border-sales/55",
+  cs: "border-cs/55",
+};
+
+const stageBorder = [
+  "border-mkt/55",
+  "border-mkt/35",
+  "border-sales/45",
+  "border-sales/65",
+  "border-sales/80",
+  "border-success/65",
+  "border-cs/45",
+  "border-cs/65",
+  "border-destructive/60",
+  "border-cs/80",
+] as const;
+
 const prioTone: Record<string, "danger" | "warning" | "neutral"> = {
   Alta: "danger",
   Média: "warning",
@@ -44,6 +70,7 @@ function KanbanPage() {
   const [dragging, setDragging] = useState<{ from: string; id: string } | null>(null);
   const [overCol, setOverCol] = useState<string | null>(null);
   const [active, setActive] = useState<Stakeholder | null>(null);
+  const [outlineMode, setOutlineMode] = useState<"area" | "stage">("area");
 
   const drop = (to: string) => {
     setOverCol(null);
@@ -80,17 +107,39 @@ function KanbanPage() {
           <Filter className="h-4 w-4" />
           Meus cards
         </button>
+        <div className="inline-flex rounded-xl bg-muted p-1">
+          <button
+            onClick={() => setOutlineMode("area")}
+            aria-label="Contorno por área"
+            className={`rounded-lg p-1.5 ${
+              outlineMode === "area" ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
+            }`}
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setOutlineMode("stage")}
+            aria-label="Contorno por etapa"
+            className={`rounded-lg p-1.5 ${
+              outlineMode === "stage" ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
+            }`}
+          >
+            <SplitSquareHorizontal className="h-4 w-4" />
+          </button>
+        </div>
       </PageHeader>
 
       <div className="flex gap-4 overflow-x-auto pb-4">
-        {kanbanColumns.map((col) => {
+        {kanbanColumns.map((col, index) => {
           const cards = (board[col.title] ?? []).filter((c) =>
             (c.name + c.company).toLowerCase().includes(query.toLowerCase()),
           );
           return (
             <div
               key={col.title}
-              className="w-[280px] shrink-0"
+              className={`w-[280px] shrink-0 rounded-2xl border p-2 ${
+                outlineMode === "area" ? accentBorder[col.accent] : stageBorder[index]
+              }`}
               onDragOver={(e) => {
                 e.preventDefault();
                 setOverCol(col.title);
@@ -137,12 +186,13 @@ function KanbanPage() {
                       <p>Última interação: {c.lastTouch}</p>
                     </div>
                     {c.ai ? (
-                      <div className="mt-3 border-t border-border pt-3">
-                        <AiBadge>IA</AiBadge>
-                        <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
-                          {c.ai}
-                        </p>
-                      </div>
+                      <VectorSurface
+                        className="mt-3"
+                        contentClassName="p-3"
+                        iconClassName="h-4 w-4"
+                      >
+                        <p className="text-[11px] leading-relaxed text-white/85">{c.ai}</p>
+                      </VectorSurface>
                     ) : (
                       <p className="mt-3 border-t border-border pt-3 text-[11px] text-muted-foreground">
                         Próxima ação: registrar interação
@@ -207,10 +257,12 @@ function KanbanPage() {
               </div>
             </div>
             {active.ai ? (
-              <div className="rounded-2xl bg-muted/60 p-4">
-                <AiBadge>Vector</AiBadge>
-                <p className="mt-2 text-sm text-muted-foreground">{active.ai}</p>
-              </div>
+              <VectorSurface contentClassName="p-4">
+                <>
+                  <p className="text-sm font-display">Leitura do Vector</p>
+                  <p className="mt-1 text-sm leading-relaxed text-white/85">{active.ai}</p>
+                </>
+              </VectorSurface>
             ) : null}
           </div>
         ) : null}

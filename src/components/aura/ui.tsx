@@ -1,5 +1,14 @@
-import { ArrowDownRight, ArrowRight, ArrowUpRight, CalendarDays, Check, Tag, X } from "lucide-react";
+import {
+  ArrowDownRight,
+  ArrowRight,
+  ArrowUpRight,
+  CalendarDays,
+  Check,
+  Tag,
+  X,
+} from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
+import type { DateRange } from "react-day-picker";
 import {
   Area,
   AreaChart,
@@ -18,10 +27,11 @@ import {
   YAxis,
 } from "recharts";
 
-import aiBg from "@/assets/ai-gradient-bg.png.asset.json";
-import vectorIconDark from "@/assets/vector-icon-dark.png.asset.json";
-import vectorIconLight from "@/assets/vector-icon-light.png.asset.json";
+import aiBg from "@/assets/aura-vector-background.png";
+import vectorIconDark from "@/assets/vector-ai-dark.png";
+import vectorIconLight from "@/assets/vector-ai-light.png";
 import { useTheme } from "@/components/aura/theme";
+import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 
 export function StarMark({ className }: { className?: string }) {
@@ -44,8 +54,31 @@ export function VectorIcon({
   onDark?: boolean;
 }) {
   const { theme } = useTheme();
-  const src = onDark || theme === "dark" ? vectorIconLight.url : vectorIconDark.url;
+  const src = onDark || theme === "dark" ? vectorIconLight : vectorIconDark;
   return <img src={src} alt="Vector" className={cn("h-6 w-6 object-contain", className)} />;
+}
+
+export function VectorSurface({
+  children,
+  className,
+  contentClassName,
+  iconClassName,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  contentClassName?: string;
+  iconClassName?: string;
+}) {
+  return (
+    <div className={cn("relative overflow-hidden rounded-2xl", className)}>
+      <img src={aiBg} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover" />
+      <div className="absolute inset-0 bg-black/35" />
+      <div className={cn("relative flex items-start gap-3 p-4 text-white", contentClassName)}>
+        <VectorIcon onDark className={cn("mt-0.5 h-5 w-5 shrink-0", iconClassName)} />
+        <div>{children}</div>
+      </div>
+    </div>
+  );
 }
 
 export function PageHeader({
@@ -110,6 +143,7 @@ export function StatCard({
   hint,
   accent,
   trend,
+  modalFilters,
 }: {
   label: string;
   value: string;
@@ -118,63 +152,65 @@ export function StatCard({
   hint?: string;
   accent?: "mkt" | "sales" | "cs";
   trend?: number[];
+  modalFilters?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const series = trend ?? [12, 18, 15, 22, 26, 24, 31];
   return (
     <>
-    <div className="surface group relative overflow-hidden p-5">
-      {trend ? (
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-[62%]">
-          <MiniTrend data={trend} up={up !== false} />
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage:
-                "linear-gradient(to right, var(--color-card) 22%, color-mix(in oklab, var(--color-card) 55%, transparent) 62%, transparent 100%)",
-            }}
-          />
+      <div className="surface group relative overflow-hidden p-5">
+        {trend ? (
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-[62%]">
+            <MiniTrend data={trend} up={up !== false} />
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage:
+                  "linear-gradient(to right, var(--color-card) 22%, color-mix(in oklab, var(--color-card) 55%, transparent) 62%, transparent 100%)",
+              }}
+            />
+          </div>
+        ) : null}
+        <div className="relative">
+          <div className="flex items-start justify-between gap-3">
+            <p className="text-xs font-medium tracking-wide text-muted-foreground">{label}</p>
+          </div>
+          <p className="mt-3 text-3xl font-semibold tracking-tight">{value}</p>
+          <div className="mt-2 flex items-center gap-2 pr-9 text-xs">
+            {delta ? (
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium",
+                  up ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive",
+                )}
+              >
+                {up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                {delta}
+              </span>
+            ) : null}
+            {hint ? <span className="text-muted-foreground">{hint}</span> : null}
+          </div>
         </div>
-      ) : null}
-      <div className="relative">
-        <div className="flex items-start justify-between gap-3">
-          <p className="text-xs font-medium tracking-wide text-muted-foreground">{label}</p>
-        </div>
-        <p className="mt-3 text-3xl font-display tracking-tight">{value}</p>
-        <div className="mt-2 flex items-center gap-2 pr-9 text-xs">
-          {delta ? (
-            <span
-              className={cn(
-                "inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium",
-                up ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive",
-              )}
-            >
-              {up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-              {delta}
-            </span>
-          ) : null}
-          {hint ? <span className="text-muted-foreground">{hint}</span> : null}
-        </div>
+        <button
+          onClick={() => setOpen(true)}
+          aria-label={`Ver detalhes de ${label}`}
+          className="absolute bottom-4 right-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+        >
+          <ArrowRight className="h-4 w-4" />
+        </button>
       </div>
-      <button
-        onClick={() => setOpen(true)}
-        aria-label={`Ver detalhes de ${label}`}
-        className="absolute bottom-4 right-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
-      >
-        <ArrowRight className="h-4 w-4" />
-      </button>
-    </div>
-    <MetricModal
-      open={open}
-      onClose={() => setOpen(false)}
-      label={label}
-      value={value}
-      delta={delta}
-      up={up}
-      hint={hint}
-      accent={accent}
-      series={series}
-    />
+      <MetricModal
+        open={open}
+        onClose={() => setOpen(false)}
+        label={label}
+        value={value}
+        delta={delta}
+        up={up}
+        hint={hint}
+        accent={accent}
+        series={series}
+        filters={modalFilters}
+      />
     </>
   );
 }
@@ -189,6 +225,7 @@ function MetricModal({
   hint,
   accent,
   series,
+  filters,
 }: {
   open: boolean;
   onClose: () => void;
@@ -199,6 +236,7 @@ function MetricModal({
   hint?: string | undefined;
   accent?: "mkt" | "sales" | "cs" | undefined;
   series: number[];
+  filters?: React.ReactNode;
 }) {
   const months = ["Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set"];
   const data = series.map((v, i) => ({ label: months[i % months.length] ?? `P${i}`, value: v }));
@@ -209,51 +247,58 @@ function MetricModal({
       open={open}
       onClose={onClose}
       title={label}
-      subtitle={accent ? `Segmento: ${segmentName[accent]}` : "Visão consolidada"}
+      className="max-w-2xl overflow-hidden p-5 sm:p-6"
+      bodyClassName="mt-4"
     >
-      <div className="flex flex-wrap items-end gap-4">
-        <p className="text-4xl font-display tracking-tight">{value}</p>
-        {delta ? (
-          <span
-            className={cn(
-              "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium",
-              up ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive",
-            )}
-          >
-            {up ? <ArrowUpRight className="h-3.5 w-3.5" /> : <ArrowDownRight className="h-3.5 w-3.5" />}
-            {delta}
-          </span>
-        ) : null}
-        {hint ? <span className="text-xs text-muted-foreground">{hint}</span> : null}
-        {accent ? <Chip tone={accent}>{segmentName[accent]}</Chip> : null}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-3xl font-semibold tracking-tight sm:text-4xl">{value}</p>
+          {delta ? (
+            <span
+              className={cn(
+                "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium",
+                up ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive",
+              )}
+            >
+              {up ? (
+                <ArrowUpRight className="h-3.5 w-3.5" />
+              ) : (
+                <ArrowDownRight className="h-3.5 w-3.5" />
+              )}
+              {delta}
+            </span>
+          ) : null}
+          {hint ? <span className="text-xs text-muted-foreground">{hint}</span> : null}
+          {accent ? <Chip tone={accent}>{segmentName[accent]}</Chip> : null}
+        </div>
+        {filters}
       </div>
-      <p className="eyebrow mt-6">Evolução do indicador</p>
+      <p className="eyebrow mt-4">Evolução do indicador</p>
       <div className="mt-2">
-        <TrendArea data={data} color={tone} height={190} />
+        <TrendArea data={data} color={tone} height={150} />
       </div>
-      <div className="mt-5 grid grid-cols-3 gap-3">
+      <div className="mt-4 grid grid-cols-3 gap-2.5">
         {[
           ["Média do período", avg.toFixed(1)],
           ["Máximo", Math.max(...series).toString()],
           ["Mínimo", Math.min(...series).toString()],
         ].map(([k, v]) => (
-          <div key={k} className="rounded-xl bg-muted/60 px-3.5 py-3">
+          <div key={k} className="rounded-xl bg-muted/60 px-3 py-2.5">
             <p className="text-[11px] text-muted-foreground">{k}</p>
-            <p className="mt-1 text-lg font-display">{v}</p>
+            <p className="mt-1 text-lg font-semibold">{v}</p>
           </div>
         ))}
       </div>
-      <div className="mt-5 flex items-start gap-3 rounded-2xl bg-primary/8 p-4">
-        <VectorIcon className="mt-0.5 h-5 w-5 shrink-0" />
-        <div>
+      <VectorSurface className="mt-4" contentClassName="p-3.5">
+        <>
           <p className="text-sm font-medium">Leitura do Vector</p>
-          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+          <p className="mt-1 text-xs leading-relaxed text-white/82">
             {up === false
               ? `${label} está abaixo da média do período (${avg.toFixed(1)}). Recomendo revisar as etapas com maior tempo de resposta e acionar o responsável da área hoje.`
               : `${label} segue acima da média do período (${avg.toFixed(1)}). Mantenha o ritmo atual e replique a prática nas contas de mesmo perfil.`}
           </p>
-        </div>
-      </div>
+        </>
+      </VectorSurface>
     </Modal>
   );
 }
@@ -320,6 +365,8 @@ export function Modal({
   subtitle,
   children,
   footer,
+  className,
+  bodyClassName,
 }: {
   open: boolean;
   onClose: () => void;
@@ -327,12 +374,19 @@ export function Modal({
   subtitle?: string | undefined;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  className?: string;
+  bodyClassName?: string;
 }) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
       <div className="overlay-dim absolute inset-0" onClick={onClose} />
-      <div className="surface relative z-10 max-h-[85vh] w-full max-w-lg overflow-y-auto p-6 shadow-2xl">
+      <div
+        className={cn(
+          "surface relative z-10 max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-hidden p-6 shadow-2xl",
+          className,
+        )}
+      >
         <div className="flex items-start justify-between gap-4">
           <div>
             <h3 className="text-xl font-display">{title}</h3>
@@ -346,7 +400,7 @@ export function Modal({
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="mt-5">{children}</div>
+        <div className={cn("mt-5", bodyClassName)}>{children}</div>
         {footer ? <div className="mt-6 flex justify-end gap-2">{footer}</div> : null}
       </div>
     </div>
@@ -460,7 +514,7 @@ export function InsightsBlock({
     <>
       <div className={cn("relative overflow-hidden rounded-2xl", className)}>
         <img
-          src={aiBg.url}
+          src={aiBg}
           alt=""
           aria-hidden
           className="absolute inset-0 h-full w-full object-cover"
@@ -501,9 +555,7 @@ export function InsightsBlock({
             return (
               <li key={i}>
                 <button
-                  onClick={() =>
-                    setDone((p) => (checked ? p.filter((x) => x !== i) : [...p, i]))
-                  }
+                  onClick={() => setDone((p) => (checked ? p.filter((x) => x !== i) : [...p, i]))}
                   className="flex w-full items-start gap-3 rounded-xl bg-muted/60 px-3.5 py-3 text-left text-sm transition-colors hover:bg-muted"
                 >
                   <span
@@ -531,9 +583,13 @@ export function InsightsBlock({
 
 export function AiBadge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="gradient-aura inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium text-white">
-      <StarMark className="h-2.5 w-2.5" />
-      {children}
+    <span className="relative inline-flex overflow-hidden rounded-full">
+      <img src={aiBg} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover" />
+      <span className="absolute inset-0 bg-black/35" />
+      <span className="relative inline-flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-medium text-white">
+        <VectorIcon onDark className="h-3 w-3" />
+        {children}
+      </span>
     </span>
   );
 }
@@ -560,11 +616,14 @@ export const datePresets = [
   "Período personalizado",
 ] as const;
 
+function formatShortDate(date: Date) {
+  return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+}
+
 export function DateFilter({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [open, setOpen] = useState(false);
   const [custom, setCustom] = useState(false);
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
+  const [range, setRange] = useState<DateRange | undefined>();
   const ref = useOutside(() => {
     setOpen(false);
     setCustom(false);
@@ -577,12 +636,12 @@ export function DateFilter({ value, onChange }: { value: string; onChange: (v: s
         <span className="hidden sm:inline">{value}</span>
       </button>
       {open ? (
-        <div className="surface absolute right-0 top-[calc(100%+8px)] z-50 w-64 p-1.5 shadow-xl">
+        <div className="surface absolute right-0 top-[calc(100%+8px)] z-50 w-[22rem] p-1.5 shadow-xl">
           {datePresets.map((p) => (
             <button
               key={p}
               onClick={() => {
-                if (p === "Período personalizado") {
+                if (p === datePresets[3]) {
                   setCustom(true);
                   return;
                 }
@@ -600,35 +659,38 @@ export function DateFilter({ value, onChange }: { value: string; onChange: (v: s
             </button>
           ))}
           {custom ? (
-            <div className="mt-1 space-y-2 rounded-lg bg-muted/60 p-3">
-              <label className="block text-[11px] text-muted-foreground">
-                De
-                <input
-                  type="date"
-                  value={from}
-                  onChange={(e) => setFrom(e.target.value)}
-                  className="mt-1 h-9 w-full rounded-lg bg-card px-2.5 text-xs outline-none focus:ring-2 focus:ring-ring/40"
-                />
-              </label>
-              <label className="block text-[11px] text-muted-foreground">
-                Até
-                <input
-                  type="date"
-                  value={to}
-                  onChange={(e) => setTo(e.target.value)}
-                  className="mt-1 h-9 w-full rounded-lg bg-card px-2.5 text-xs outline-none focus:ring-2 focus:ring-ring/40"
-                />
-              </label>
+            <div className="mt-1 rounded-lg bg-muted/60 p-2">
+              <Calendar
+                mode="range"
+                selected={range}
+                onSelect={setRange}
+                numberOfMonths={1}
+                className="bg-transparent p-1 [--cell-size:2.15rem]"
+              />
+              <div className="mt-2 flex items-center justify-between gap-2 px-1">
+                <p className="text-[11px] text-muted-foreground">
+                  {range?.from
+                    ? range.to
+                      ? `${formatShortDate(range.from)} - ${formatShortDate(range.to)}`
+                      : `${formatShortDate(range.from)} - ...`
+                    : "Selecione inicio e fim"}
+                </p>
+                <button
+                  onClick={() => setRange(undefined)}
+                  className="rounded-lg px-2 py-1 text-[11px] text-muted-foreground hover:bg-card"
+                >
+                  Limpar
+                </button>
+              </div>
               <button
-                disabled={!from || !to}
+                disabled={!range?.from || !range?.to}
                 onClick={() => {
-                  onChange(
-                    `${from.split("-").reverse().join("/")} – ${to.split("-").reverse().join("/")}`,
-                  );
+                  if (!range?.from || !range?.to) return;
+                  onChange(`${formatShortDate(range.from)} - ${formatShortDate(range.to)}`);
                   setOpen(false);
                   setCustom(false);
                 }}
-                className="w-full rounded-lg bg-primary py-2 text-xs font-medium text-primary-foreground disabled:opacity-50"
+                className="mt-2 w-full rounded-lg bg-primary py-2 text-xs font-medium text-primary-foreground disabled:opacity-50"
               >
                 Aplicar intervalo
               </button>
@@ -688,18 +750,20 @@ export function AnalyticsFilters({
   onPeriod,
   sector,
   onSector,
+  showSector = true,
   className,
 }: {
   period: string;
   onPeriod: (v: string) => void;
   sector: string;
   onSector: (v: string) => void;
+  showSector?: boolean;
   className?: string;
 }) {
   return (
     <div className={cn("flex shrink-0 items-center gap-1.5", className)}>
       <DateFilter value={period} onChange={onPeriod} />
-      <CategoryFilter value={sector} onChange={onSector} />
+      {showSector ? <CategoryFilter value={sector} onChange={onSector} /> : null}
     </div>
   );
 }
@@ -985,7 +1049,7 @@ export function Heatmap({
     <div className="overflow-x-auto">
       <div className="min-w-[520px]">
         <div
-          className="grid gap-2 pl-36 text-[11px] text-muted-foreground"
+          className="grid gap-1.5 pl-32 text-[10px] text-muted-foreground"
           style={{ gridTemplateColumns: `repeat(${cols.length}, minmax(0,1fr))` }}
         >
           {cols.map((c) => (
@@ -996,10 +1060,10 @@ export function Heatmap({
         </div>
         <div className="mt-2 space-y-2">
           {rows.map((row) => (
-            <div key={row.channel} className="flex items-center gap-2">
-              <span className="w-36 shrink-0 truncate text-xs">{row.channel}</span>
+            <div key={row.channel} className="flex items-center gap-1.5">
+              <span className="w-32 shrink-0 truncate text-xs">{row.channel}</span>
               <div
-                className="grid flex-1 gap-2"
+                className="grid flex-1 gap-1.5"
                 style={{
                   gridTemplateColumns: `repeat(${row.cells.length}, minmax(0,1fr))`,
                 }}
@@ -1007,11 +1071,11 @@ export function Heatmap({
                 {row.cells.map((v, i) => (
                   <div
                     key={i}
-                    className="flex h-10 items-center justify-center rounded-xl text-[11px] font-medium"
+                    className="flex h-8 items-center justify-center rounded-lg text-[11px] font-semibold"
                     style={{
                       backgroundColor: tone,
                       opacity: 0.12 + (v / 100) * 0.85,
-                      color: v > 55 ? "#fff" : "var(--color-foreground)",
+                      color: v > 38 ? "#fff" : "var(--color-foreground)",
                     }}
                   >
                     {v}%

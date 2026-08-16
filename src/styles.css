@@ -20,8 +20,7 @@
 
 @theme inline {
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display:
-    "Helvetica Now Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display: "Helvetica Now Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --color-mkt: var(--mkt);
   --color-sales: var(--sales);
   --color-cs: var(--cs);
@@ -163,8 +162,7 @@
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: color-mix(in oklab, var(--color-muted-foreground) 40%, transparent)
-      transparent;
+    scrollbar-color: color-mix(in oklab, var(--color-muted-foreground) 40%, transparent) transparent;
   }
 
   ::-webkit-scrollbar {
@@ -208,21 +206,11 @@
 }
 
 @utility gradient-aura {
-  background-image: linear-gradient(
-    115deg,
-    var(--mkt) 0%,
-    var(--sales) 48%,
-    var(--cs) 100%
-  );
+  background-image: linear-gradient(115deg, var(--mkt) 0%, var(--sales) 48%, var(--cs) 100%);
 }
 
 @utility gradient-aura-text {
-  background-image: linear-gradient(
-    100deg,
-    var(--mkt) 0%,
-    var(--sales) 50%,
-    var(--cs) 100%
-  );
+  background-image: linear-gradient(100deg, var(--mkt) 0%, var(--sales) 50%, var(--cs) 100%);
   background-clip: text;
   color: transparent;
 }
@@ -230,13 +218,22 @@
 @utility surface {
   background-color: var(--color-card);
   border-radius: var(--radius-xl);
-  box-shadow: 0 1px 2px oklch(0 0 0 / 4%), 0 8px 24px -18px oklch(0 0 0 / 22%);
+  box-shadow:
+    0 1px 2px oklch(0 0 0 / 4%),
+    0 8px 24px -18px oklch(0 0 0 / 22%);
 }
 
 @utility glass-header {
   background-color: color-mix(in oklab, var(--color-background) 45%, transparent);
   backdrop-filter: blur(20px) saturate(160%);
   border-bottom: 1px solid var(--color-border);
+}
+
+@utility glass-control {
+  background-color: color-mix(in oklab, var(--color-card) 72%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-border) 80%, transparent);
+  box-shadow: 0 1px 2px oklch(0 0 0 / 6%);
+  backdrop-filter: blur(16px) saturate(150%);
 }
 
 @utility overlay-dim {

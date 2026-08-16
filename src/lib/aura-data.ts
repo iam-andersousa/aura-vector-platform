@@ -423,7 +423,7 @@ export const campaigns = [
     status: "Ativa",
   },
   {
-    name: "Webinar Jornada 360",
+    name: "Webinar Jornada",
     channel: "Orgânico",
     leads: 141,
     quality: 88,

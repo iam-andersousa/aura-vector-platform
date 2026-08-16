@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import profilePic from "@/assets/profile-user.png.asset.json";
+import type { UserProfile } from "@/components/aura/ChatView";
 import { useTheme } from "@/components/aura/theme";
 import { Modal } from "@/components/aura/ui";
 import { cn } from "@/lib/utils";
@@ -47,13 +47,34 @@ function Row({
 
 const tabs = ["Interface", "Usuário"] as const;
 
-export function SettingsModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function SettingsModal({
+  open,
+  onClose,
+  userProfile,
+  onUserProfileChange,
+}: {
+  open: boolean;
+  onClose: () => void;
+  userProfile: UserProfile;
+  onUserProfileChange: (profile: UserProfile) => void;
+}) {
   const { theme, toggle } = useTheme();
   const [tab, setTab] = useState<(typeof tabs)[number]>("Interface");
   const [compact, setCompact] = useState(false);
   const [aiHints, setAiHints] = useState(true);
   const [sla, setSla] = useState(true);
   const [digest, setDigest] = useState(true);
+  const updateProfile = (patch: Partial<UserProfile>) => {
+    onUserProfileChange({ ...userProfile, ...patch });
+  };
+  const onAvatarFile = (file: File | undefined) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") updateProfile({ avatar: reader.result });
+    };
+    reader.readAsDataURL(file);
+  };
 
   return (
     <Modal
@@ -101,16 +122,44 @@ export function SettingsModal({ open, onClose }: { open: boolean; onClose: () =>
         <div className="mt-4">
           <div className="flex items-center gap-3.5">
             <img
-              src={profilePic.url}
-              alt="Marina Souza"
+              src={userProfile.avatar}
+              alt={userProfile.name}
               className="h-14 w-14 rounded-full object-cover"
             />
-            <div>
-              <p className="text-sm font-medium">Marina Souza</p>
-              <p className="text-xs text-muted-foreground">
-                Head de RevOps · marina@auravector.com
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium">{userProfile.name}</p>
+              <p className="truncate text-xs text-muted-foreground">
+                {userProfile.role} · {userProfile.email}
               </p>
+              <label className="mt-2 inline-flex cursor-pointer rounded-lg bg-muted px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground">
+                Trocar foto
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => onAvatarFile(e.target.files?.[0])}
+                />
+              </label>
             </div>
+          </div>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <label className="block text-xs">
+              <span className="text-muted-foreground">Nome</span>
+              <input
+                value={userProfile.name}
+                onChange={(e) => updateProfile({ name: e.target.value })}
+                className="mt-1.5 h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/40"
+              />
+            </label>
+            <label className="block text-xs">
+              <span className="text-muted-foreground">E-mail</span>
+              <input
+                type="email"
+                value={userProfile.email}
+                onChange={(e) => updateProfile({ email: e.target.value })}
+                className="mt-1.5 h-10 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/40"
+              />
+            </label>
           </div>
           <div className="mt-3 divide-y divide-border">
             <Row title="Alertas de speed to lead" desc="Notifica após 5 minutos sem contato">

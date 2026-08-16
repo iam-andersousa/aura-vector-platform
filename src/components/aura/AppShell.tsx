@@ -28,27 +28,28 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-import logoDark from "@/assets/aura-logo-dark.png.asset.json";
-import logoLight from "@/assets/aura-logo-light.png.asset.json";
-import markDark from "@/assets/aura-mark-dark.png.asset.json";
-import markWhite from "@/assets/aura-mark-white.png.asset.json";
+import logoDark from "@/assets/aura-vector-logo-dark.png";
+import logoLight from "@/assets/aura-vector-logo-light.png";
+import markDark from "@/assets/aura-mark-new-dark.png";
+import markWhite from "@/assets/aura-mark-new-white.png";
+import aiBg from "@/assets/aura-vector-background.png";
 import profilePic from "@/assets/profile-user.png.asset.json";
-import { ChatView } from "@/components/aura/ChatView";
+import { ChatView, type UserProfile } from "@/components/aura/ChatView";
 import { ChatSidebar } from "@/components/aura/ChatSidebar";
 import { SettingsModal } from "@/components/aura/SettingsModal";
 import { useTheme } from "@/components/aura/theme";
-import { StarMark } from "@/components/aura/ui";
+import { VectorIcon } from "@/components/aura/ui";
 import { cn } from "@/lib/utils";
 
 const nav = [
   { to: "/", label: "Command Center", icon: LayoutGrid },
   { to: "/stakeholders", label: "Stakeholders", icon: Users },
-  { to: "/jornada", label: "Jornada 360", icon: RouteIcon },
+  { to: "/jornada", label: "Jornada", icon: RouteIcon },
   { to: "/marketing", label: "Marketing", icon: Megaphone },
   { to: "/vendas", label: "Vendas", icon: Gauge },
   { to: "/apoio-ao-cliente", label: "Apoio ao Cliente", icon: LifeBuoy },
   { to: "/kanban", label: "Kanban RevOps", icon: KanbanSquare },
-  { to: "/inteligencia-ia", label: "Inteligência IA", icon: Bot },
+  { to: "/inteligencia-ia", label: "Insights", icon: Bot },
   { to: "/integracoes", label: "Integrações", icon: Plug },
   { to: "/automacoes", label: "Automações", icon: Workflow },
   { to: "/relatorios", label: "Relatórios", icon: FileBarChart },
@@ -59,27 +60,31 @@ function Logo({ collapsed }: { collapsed: boolean }) {
   if (collapsed) {
     return (
       <img
-        src={theme === "dark" ? markWhite.url : markDark.url}
+        src={theme === "dark" ? markWhite : markDark}
         alt="Aura Vector"
-        className="h-14 w-14"
+        className="h-9 w-9 object-contain"
       />
     );
   }
   return (
-    <img
-      src={theme === "dark" ? logoLight.url : logoDark.url}
-      alt="Aura Vector"
-      className="h-20 w-auto max-w-full object-contain object-left"
-    />
+    <span className="flex h-16 max-w-full items-center overflow-hidden">
+      <img
+        src={theme === "dark" ? logoLight : logoDark}
+        alt="Aura Vector"
+        className="h-24 w-auto max-w-full object-contain object-left"
+      />
+    </span>
   );
 }
 
 function UserMenu({
   collapsed,
   onSettings,
+  userProfile,
 }: {
   collapsed?: boolean;
   onSettings: () => void;
+  userProfile: UserProfile;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -112,22 +117,22 @@ function UserMenu({
         )}
       >
         <img
-          src={profilePic.url}
-          alt="Marina Souza"
+          src={userProfile.avatar}
+          alt={userProfile.name}
           className="h-9 w-9 shrink-0 rounded-full object-cover"
         />
         {!collapsed ? (
           <>
             <div className="min-w-0 flex-1 text-left leading-tight">
-              <p className="truncate text-xs font-medium">Marina Souza</p>
-              <p className="truncate text-[11px] text-muted-foreground">Head de RevOps</p>
+              <p className="truncate text-xs font-medium">{userProfile.name}</p>
+              <p className="truncate text-[11px] text-muted-foreground">{userProfile.role}</p>
             </div>
             <ChevronUp className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
           </>
         ) : null}
       </button>
       {open ? (
-        <div className="surface absolute bottom-[calc(100%+10px)] left-0 z-50 w-56 overflow-hidden p-1.5 shadow-xl">
+        <div className="surface absolute bottom-[calc(100%+10px)] left-0 z-50 w-56 overflow-hidden p-1.5 shadow-2xl ring-1 ring-border/60">
           {items.map((item) => (
             <button
               key={item.label}
@@ -149,6 +154,30 @@ function UserMenu({
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { theme, toggle } = useTheme();
+  const [userProfile, setUserProfile] = useState<UserProfile>(() => {
+    if (typeof window === "undefined") {
+      return {
+        name: "Marina Souza",
+        email: "marina@auravector.com",
+        role: "Head de RevOps",
+        avatar: profilePic.url,
+      };
+    }
+    const saved = window.localStorage.getItem("aura-user-profile");
+    if (saved) {
+      try {
+        return JSON.parse(saved) as UserProfile;
+      } catch {
+        window.localStorage.removeItem("aura-user-profile");
+      }
+    }
+    return {
+      name: "Marina Souza",
+      email: "marina@auravector.com",
+      role: "Head de RevOps",
+      avatar: profilePic.url,
+    };
+  });
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [view, setView] = useState<"dashboard" | "chat">("dashboard");
@@ -158,9 +187,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [notifOpen, setNotifOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
+  const updateUserProfile = (next: UserProfile) => {
+    setUserProfile(next);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("aura-user-profile", JSON.stringify(next));
+    }
+  };
+
   const dashboardSidebar = (
     <nav className="flex h-full flex-col gap-1 p-3">
-      <div className="min-h-0 flex-1 space-y-1 overflow-y-auto">
+      <div className="min-h-0 flex-1 space-y-1 overflow-visible">
         {nav.map((item) => {
           const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
           return (
@@ -169,20 +205,31 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               to={item.to}
               onClick={() => setMobileOpen(false)}
               className={cn(
-                "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors",
+                "group relative flex items-center rounded-xl px-3 py-2.5 text-sm transition-colors",
+                collapsed ? "justify-center px-0" : "gap-3",
                 active
                   ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
             >
               <item.icon className="h-4 w-4 shrink-0" />
-              {!collapsed ? <span className="truncate">{item.label}</span> : null}
+              {collapsed ? (
+                <span className="pointer-events-none absolute left-[calc(100%+10px)] top-1/2 z-[100] -translate-y-1/2 whitespace-nowrap rounded-lg border border-border bg-popover px-2.5 py-1.5 text-xs text-popover-foreground opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
+                  {item.label}
+                </span>
+              ) : (
+                <span className="truncate">{item.label}</span>
+              )}
             </Link>
           );
         })}
       </div>
       <div className="mt-3 shrink-0 border-t border-border/60 pt-3">
-        <UserMenu collapsed={collapsed} onSettings={() => setSettingsOpen(true)} />
+        <UserMenu
+          collapsed={collapsed}
+          onSettings={() => setSettingsOpen(true)}
+          userProfile={userProfile}
+        />
       </div>
     </nav>
   );
@@ -194,7 +241,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <ChatSidebar collapsed={collapsed} />
         </div>
         <div className="shrink-0 border-t border-border/60 p-3">
-          <UserMenu collapsed={collapsed} onSettings={() => setSettingsOpen(true)} />
+          <UserMenu
+            collapsed={collapsed}
+            onSettings={() => setSettingsOpen(true)}
+            userProfile={userProfile}
+          />
         </div>
       </div>
     ) : (
@@ -204,7 +255,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
       <header className="glass-header sticky top-0 z-40">
-        <div className="flex h-[88px] items-center gap-3 px-4 sm:px-6">
+        <div className="flex h-[72px] items-center gap-3 px-4 sm:px-6">
           <button
             className="rounded-lg p-2 hover:bg-muted lg:hidden"
             onClick={() => setMobileOpen(true)}
@@ -230,10 +281,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               onChange={(e) => {
                 setSearch(e.target.value);
                 setSearchOpen(true);
+                setNotifOpen(false);
               }}
-              onFocus={() => setSearchOpen(true)}
+              onFocus={() => {
+                setSearchOpen(true);
+                setNotifOpen(false);
+              }}
               placeholder="Buscar stakeholders, contas, campanhas…"
-              className="relative z-50 h-10 w-full rounded-xl border border-border bg-card pl-9 pr-16 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring/40"
+              className="glass-control relative z-50 h-10 w-full rounded-xl pl-9 pr-16 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring/40"
             />
             <kbd className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground">
               ⌘K
@@ -264,14 +319,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="ml-auto flex items-center gap-2 md:ml-0">
-            <div className="flex items-center gap-1 rounded-xl bg-muted p-1">
+            <div className="glass-control flex items-center gap-1 rounded-xl p-1">
               <button
                 onClick={() => setView("dashboard")}
                 aria-label="Visão de dashboard"
                 className={cn(
                   "rounded-lg p-1.5 transition-colors",
                   view === "dashboard"
-                    ? "bg-card text-primary shadow-sm"
+                    ? "bg-card/90 text-primary shadow-sm"
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
@@ -283,25 +338,37 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 className={cn(
                   "rounded-lg p-1.5 transition-colors",
                   view === "chat"
-                    ? "bg-card text-primary shadow-sm"
+                    ? "bg-card/90 text-primary shadow-sm"
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
-                <StarMark className="h-4 w-4" />
+                <span className="relative -m-1 flex h-7 w-7 items-center justify-center overflow-hidden rounded-lg">
+                  <img
+                    src={aiBg}
+                    alt=""
+                    aria-hidden
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                  <span className="absolute inset-0 bg-black/35" />
+                  <VectorIcon onDark className="relative h-4 w-4" />
+                </span>
               </button>
             </div>
             <button
               onClick={toggle}
               aria-label="Alternar tema"
-              className="rounded-xl bg-muted p-2.5 text-muted-foreground transition-colors hover:text-foreground"
+              className="glass-control rounded-xl p-2.5 text-muted-foreground transition-colors hover:text-foreground"
             >
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
             <div className="relative z-50">
               <button
-                onClick={() => setNotifOpen((o) => !o)}
+                onClick={() => {
+                  setSearchOpen(false);
+                  setNotifOpen((o) => !o);
+                }}
                 aria-label="Notificações"
-                className="relative rounded-xl bg-muted p-2.5 text-muted-foreground transition-colors hover:text-foreground"
+                className="glass-control relative rounded-xl p-2.5 text-muted-foreground transition-colors hover:text-foreground"
               >
                 <Bell className="h-4 w-4" />
                 <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-cs" />
@@ -314,7 +381,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     ["Health score em queda", "Orbita Log caiu para 52"],
                     ["Proposta aceita", "Grupo Vertex · R$ 184 mil"],
                   ].map(([t, d]) => (
-                    <div key={t} className="rounded-lg px-2.5 py-2 transition-colors hover:bg-muted">
+                    <div
+                      key={t}
+                      className="rounded-lg px-2.5 py-2 transition-colors hover:bg-muted"
+                    >
                       <p className="text-sm">{t}</p>
                       <p className="text-[11px] text-muted-foreground">{d}</p>
                     </div>
@@ -342,7 +412,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex">
         <aside
-          className="sticky top-[88px] hidden h-[calc(100vh-88px)] shrink-0 border-r border-border bg-sidebar lg:block"
+          className="sticky top-[72px] z-[70] hidden h-[calc(100vh-72px)] shrink-0 border-r border-border bg-sidebar lg:block"
           style={{ width: collapsed ? 76 : 260 }}
         >
           {sidebar}
@@ -377,12 +447,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <main className="min-w-0 flex-1 px-4 py-8 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1400px] space-y-10">
-            {view === "chat" ? <ChatView /> : children}
+            {view === "chat" ? <ChatView userProfile={userProfile} /> : children}
           </div>
         </main>
       </div>
 
-      <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <SettingsModal
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        userProfile={userProfile}
+        onUserProfileChange={updateUserProfile}
+      />
     </div>
   );
 }

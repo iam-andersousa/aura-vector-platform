@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Building2, Mail, MessageSquare, Phone, Plus, Search, Sparkles } from "lucide-react";
+import { Building2, Mail, MessageSquare, PanelRightOpen, Phone, Plus, Search } from "lucide-react";
 import { useState } from "react";
 
 import {
@@ -11,19 +11,20 @@ import {
   Panel,
   ProgressBar,
   SectionTitle,
+  VectorSurface,
 } from "@/components/aura/ui";
 import { stakeholders, timeline } from "@/lib/aura-data";
 
 export const Route = createFileRoute("/stakeholders")({
   head: () => ({
     meta: [
-      { title: "Stakeholder 360 — Aura Vector" },
+      { title: "Stakeholders — Aura Vector" },
       {
         name: "description",
         content:
           "Perfil completo de leads, clientes, usuários, parceiros e decisores em uma visão única de relacionamento.",
       },
-      { property: "og:title", content: "Stakeholder 360 — Aura Vector" },
+      { property: "og:title", content: "Stakeholders — Aura Vector" },
       { property: "og:description", content: "Entenda cada relação antes de agir." },
     ],
   }),
@@ -43,6 +44,7 @@ function StakeholdersPage() {
   const [type, setType] = useState("Todos");
   const [selectedId, setSelectedId] = useState(stakeholders[0]!.id);
   const [openNew, setOpenNew] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   const filtered = stakeholders.filter(
     (s) =>
@@ -54,7 +56,7 @@ function StakeholdersPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Stakeholder 360"
+        eyebrow="Stakeholders"
         title="Entenda cada relação antes de agir."
         subtitle="Aura Vector não enxerga apenas “lead” ou “cliente” — enxerga cada stakeholder relevante para a receita."
       >
@@ -157,7 +159,10 @@ function StakeholdersPage() {
             {filtered.map((s) => (
               <button
                 key={s.id}
-                onClick={() => setSelectedId(s.id)}
+                onClick={() => {
+                  setSelectedId(s.id);
+                  setDetailsOpen(false);
+                }}
                 className={`flex w-full items-center gap-3 p-4 text-left transition-colors ${
                   s.id === selected.id ? "bg-accent/60" : "hover:bg-muted/50"
                 }`}
@@ -206,8 +211,39 @@ function StakeholdersPage() {
                 <Chip tone={selected.status === "Em risco" ? "danger" : "sales"}>
                   {selected.status}
                 </Chip>
+                <button
+                  onClick={() => setDetailsOpen((open) => !open)}
+                  aria-label="Abrir detalhes do stakeholder"
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <PanelRightOpen className="h-3.5 w-3.5" />
+                </button>
               </div>
             </div>
+
+            {detailsOpen ? (
+              <div className="mt-4 rounded-2xl border border-border bg-muted/35 p-4">
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  {[
+                    ["Responsavel", selected.owner],
+                    [
+                      "E-mail",
+                      `${selected.name.split(" ")[0].toLowerCase()}@${selected.company
+                        .toLowerCase()
+                        .replace(/\s+/g, "")
+                        .replace(/[^a-z]/g, "")}.com.br`,
+                    ],
+                    ["Telefone", "+55 11 90000-0000"],
+                    ["Negocio", `${selected.value} · ${selected.origin}`],
+                  ].map(([k, v]) => (
+                    <div key={k} className="rounded-xl bg-card/70 p-3">
+                      <p className="text-[11px] text-muted-foreground">{k}</p>
+                      <p className="mt-1 truncate text-sm font-medium">{v}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {[
@@ -244,17 +280,39 @@ function StakeholdersPage() {
                   </p>
                 </div>
               </div>
-              <div className="gradient-aura rounded-2xl p-[1.5px]">
-                <div className="h-full rounded-[15px] bg-card p-4">
-                  <span className="gradient-aura inline-flex h-6 w-6 items-center justify-center rounded-full">
-                    <Sparkles className="h-3 w-3 text-white" />
-                  </span>
-                  <p className="mt-3 text-sm font-display">Próximo passo sugerido</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
+              <VectorSurface className="h-full" contentClassName="h-full p-4">
+                <>
+                  <p className="text-sm font-display">Próximo passo sugerido</p>
+                  <p className="mt-1 text-xs leading-relaxed text-white/82">
                     {selected.ai ?? "Registrar interação e confirmar próximo marco da jornada."}
                   </p>
-                </div>
-              </div>
+                </>
+              </VectorSurface>
+            </div>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              {[
+                ["Priorizar", selected.priority, "Ajustar cadencia pelo nivel de prioridade."],
+                [
+                  "Avancar jornada",
+                  selected.journey,
+                  "Confirmar o proximo marco com o responsavel.",
+                ],
+                [
+                  "Proteger valor",
+                  selected.value,
+                  selected.ai ?? "Registrar interacao e revisar risco.",
+                ],
+              ].map(([title, meta, action]) => (
+                <button
+                  key={title}
+                  className="rounded-xl bg-muted/60 p-3 text-left transition-colors hover:bg-muted"
+                >
+                  <p className="text-[11px] font-medium text-muted-foreground">{meta}</p>
+                  <p className="mt-2 text-sm font-medium">{title}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{action}</p>
+                </button>
+              ))}
             </div>
 
             <div className="mt-6 flex flex-wrap gap-2">
@@ -337,6 +395,12 @@ function StakeholdersPage() {
             <SectionTitle action={<AiBadge>Resumo automático</AiBadge>}>
               Histórico de interações
             </SectionTitle>
+            <VectorSurface className="mb-5" contentClassName="p-3.5" iconClassName="h-4 w-4">
+              <p className="text-xs leading-relaxed text-white/85">
+                Vector detectou interesse ativo, objeção de integração e melhor resposta por
+                WhatsApp.
+              </p>
+            </VectorSurface>
             <div className="space-y-5">
               {timeline.map((t) => (
                 <div key={t.when} className="flex gap-4">

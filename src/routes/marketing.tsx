@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { ArrowUpDown } from "lucide-react";
 import { useState } from "react";
 
 import {
-  AiCard,
   Chip,
   Heatmap,
   AnalyticsFilters,
+  InsightsBlock,
   PageHeader,
   Panel,
   ProgressBar,
@@ -14,6 +15,17 @@ import {
   StatCard,
 } from "@/components/aura/ui";
 import { campaigns, channelMatrix } from "@/lib/aura-data";
+
+type CampaignSort = "leads" | "quality" | "cpl" | "revenue";
+
+function moneyValue(value: string) {
+  const multiplier = value.toLowerCase().includes("m")
+    ? 1000000
+    : value.toLowerCase().includes("k")
+      ? 1000
+      : 1;
+  return Number(value.replace(/[^\d,.-]/g, "").replace(",", ".")) * multiplier;
+}
 
 export const Route = createFileRoute("/marketing")({
   head: () => ({
@@ -36,9 +48,49 @@ export const Route = createFileRoute("/marketing")({
 
 function MarketingPage() {
   const [period, setPeriod] = useState<string>("Este mês");
-  const [sector, setSector] = useState<string>("Todos");
+  const [channelsPeriod, setChannelsPeriod] = useState<string | null>(null);
+  const [sort, setSort] = useState<{ key: CampaignSort; dir: "asc" | "desc" }>({
+    key: "revenue",
+    dir: "desc",
+  });
+  const setPagePeriod = (value: string) => {
+    setPeriod(value);
+    setChannelsPeriod(null);
+  };
   const filters = (
-    <AnalyticsFilters period={period} onPeriod={setPeriod} sector={sector} onSector={setSector} />
+    <AnalyticsFilters
+      period={period}
+      onPeriod={setPagePeriod}
+      sector="Todos"
+      onSector={() => undefined}
+      showSector={false}
+    />
+  );
+  const timeFilter = (value: string, onChange: (v: string) => void) => (
+    <AnalyticsFilters
+      period={value}
+      onPeriod={onChange}
+      sector="Todos"
+      onSector={() => undefined}
+      showSector={false}
+    />
+  );
+  const sortedCampaigns = [...campaigns].sort((a, b) => {
+    const read = (c: (typeof campaigns)[number]) =>
+      sort.key === "cpl" || sort.key === "revenue" ? moneyValue(c[sort.key]) : c[sort.key];
+    const delta = Number(read(a)) - Number(read(b));
+    return sort.dir === "asc" ? delta : -delta;
+  });
+  const sortButton = (key: CampaignSort, label: string) => (
+    <button
+      onClick={() =>
+        setSort((s) => ({ key, dir: s.key === key && s.dir === "desc" ? "asc" : "desc" }))
+      }
+      className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground"
+    >
+      {label}
+      <ArrowUpDown className="h-3 w-3" />
+    </button>
   );
   return (
     <>
@@ -61,6 +113,7 @@ function MarketingPage() {
           up
           accent="mkt"
           hint="90 dias"
+          modalFilters={filters}
         />
         <StatCard
           label="Qualidade média do lead"
@@ -68,8 +121,16 @@ function MarketingPage() {
           delta="-4,1"
           hint="score 0-100"
           accent="mkt"
+          modalFilters={filters}
         />
-        <StatCard label="Receita atribuída" value="R$ 3,72M" delta="+14,2%" up accent="mkt" />
+        <StatCard
+          label="Receita atribuída"
+          value="R$ 3,72M"
+          delta="+14,2%"
+          up
+          accent="mkt"
+          modalFilters={filters}
+        />
         <StatCard
           label="CPL médio"
           value="R$ 38"
@@ -77,12 +138,15 @@ function MarketingPage() {
           up
           accent="mkt"
           hint="CAC estimado: R$ 4,1k"
+          modalFilters={filters}
         />
       </section>
 
       <section className="grid gap-4 lg:grid-cols-3">
         <Panel className="lg:col-span-2">
-          <SectionTitle action={filters}>Canais de aquisição</SectionTitle>
+          <SectionTitle action={timeFilter(channelsPeriod ?? period, setChannelsPeriod)}>
+            Canais de aquisição
+          </SectionTitle>
           <Donut
             centerLabel="leads"
             data={campaigns.map((c) => ({ label: c.channel, value: c.leads }))}
@@ -129,17 +193,17 @@ function MarketingPage() {
           <table className="w-full min-w-[760px] text-sm">
             <thead>
               <tr className="border-b border-border text-left text-[11px] uppercase tracking-wider text-muted-foreground">
-                {["Campanha", "Canal", "Leads", "Qualidade", "CPL", "Receita", "Status"].map(
-                  (h) => (
-                    <th key={h} className="px-5 py-3 font-medium">
-                      {h}
-                    </th>
-                  ),
-                )}
+                <th className="px-5 py-3 font-medium">Campanha</th>
+                <th className="px-5 py-3 font-medium">Canal</th>
+                <th className="px-5 py-3 font-medium">{sortButton("leads", "Leads")}</th>
+                <th className="px-5 py-3 font-medium">{sortButton("quality", "Qualidade")}</th>
+                <th className="px-5 py-3 font-medium">{sortButton("cpl", "CPL")}</th>
+                <th className="px-5 py-3 font-medium">{sortButton("revenue", "Receita")}</th>
+                <th className="px-5 py-3 font-medium">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {campaigns.map((c) => (
+              {sortedCampaigns.map((c) => (
                 <tr key={c.name} className="transition-colors hover:bg-muted/50">
                   <td className="px-5 py-4 font-medium">{c.name}</td>
                   <td className="px-5 py-4 text-muted-foreground">{c.channel}</td>
@@ -163,24 +227,16 @@ function MarketingPage() {
       </section>
 
       <section>
-        <SectionTitle>Sugestões de IA para campanhas</SectionTitle>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          <AiCard
-            tag="Meta Ads"
-            title="Pausar retargeting de público frio"
-            body="Score médio 41 e conversão 5,4%. Realocar R$ 12k/mês para LinkedIn Ads."
-          />
-          <AiCard
-            tag="LinkedIn Ads"
-            title="Escalar campanha Front Office"
-            body="Melhor receita por lead da base (R$ 4,5k). Espaço para +25% de budget sem saturação."
-          />
-          <AiCard
-            tag="Conteúdo"
-            title="Repetir webinar Jornada 360"
-            body="Score 88 e R$ 540k atribuídos com custo zero de mídia."
-          />
-        </div>
+        <SectionTitle>Sugestoes de IA para campanhas</SectionTitle>
+        <InsightsBlock
+          title="Otimizar verba para canais com maior receita atribuida"
+          body="Vector encontrou sinais para reduzir desperdicio em publico frio, escalar LinkedIn Ads e repetir o webinar Jornada."
+          items={[
+            "Pausar retargeting de publico frio e realocar R$ 12k/mes para LinkedIn Ads.",
+            "Escalar a campanha Front Office em 25% sem saturar a audiencia.",
+            "Repetir o webinar Jornada com foco em leads de score acima de 80.",
+          ]}
+        />
       </section>
     </>
   );
