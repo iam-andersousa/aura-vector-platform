@@ -62,16 +62,16 @@ function Logo({ collapsed }: { collapsed: boolean }) {
       <img
         src={theme === "dark" ? markWhite : markDark}
         alt="Aura Vector"
-        className="h-9 w-9 object-contain"
+        className="h-6 w-6 object-contain"
       />
     );
   }
   return (
-    <span className="flex h-16 max-w-full items-center overflow-hidden">
+    <span className="flex h-12 w-[240px] max-w-full items-center overflow-hidden">
       <img
         src={theme === "dark" ? logoLight : logoDark}
         alt="Aura Vector"
-        className="h-24 w-auto max-w-full object-contain object-left"
+        className="h-28 w-full max-w-none shrink-0 object-contain"
       />
     </span>
   );
@@ -132,7 +132,7 @@ function UserMenu({
         ) : null}
       </button>
       {open ? (
-        <div className="surface absolute bottom-[calc(100%+10px)] left-0 z-50 w-56 overflow-hidden p-1.5 shadow-2xl ring-1 ring-border/60">
+        <div className="surface user-menu-shadow absolute bottom-[calc(100%+10px)] left-0 z-50 w-56 overflow-hidden p-1.5 ring-1 ring-border/60">
           {items.map((item) => (
             <button
               key={item.label}
@@ -206,7 +206,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               onClick={() => setMobileOpen(false)}
               className={cn(
                 "group relative flex items-center rounded-xl px-3 py-2.5 text-sm transition-colors",
-                collapsed ? "justify-center px-0" : "gap-3",
+                collapsed ? "flex-col justify-center gap-1 px-1 py-2" : "gap-3",
                 active
                   ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -214,7 +214,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               <item.icon className="h-4 w-4 shrink-0" />
               {collapsed ? (
-                <span className="pointer-events-none absolute left-[calc(100%+10px)] top-1/2 z-[100] -translate-y-1/2 whitespace-nowrap rounded-lg border border-border bg-popover px-2.5 py-1.5 text-xs text-popover-foreground opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
+                <span className="w-full text-center text-[10px] leading-tight">
                   {item.label}
                 </span>
               ) : (
@@ -255,7 +255,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
       <header className="glass-header sticky top-0 z-40">
-        <div className="flex h-[72px] items-center gap-3 px-4 sm:px-6">
+        <div className="flex h-16 items-center gap-2 px-4 sm:gap-3 sm:px-6">
           <button
             className="rounded-lg p-2 hover:bg-muted lg:hidden"
             onClick={() => setMobileOpen(true)}
@@ -265,12 +265,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </button>
           <Link
             to="/"
-            className="hidden items-center lg:flex"
-            style={{ width: collapsed ? 60 : 300 }}
+            className={cn("hidden shrink-0 items-center lg:flex", collapsed ? "w-16" : "w-[236px]")}
           >
             <Logo collapsed={collapsed} />
           </Link>
-          <div className="lg:hidden">
+          <div className="min-w-0 max-w-[180px] shrink sm:max-w-[240px] lg:hidden">
             <Logo collapsed={false} />
           </div>
 
@@ -349,7 +348,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     aria-hidden
                     className="absolute inset-0 h-full w-full object-cover"
                   />
-                  <span className="absolute inset-0 bg-black/35" />
+                  <span className="absolute inset-0 bg-vector-overlay/35" />
                   <VectorIcon onDark className="relative h-4 w-4" />
                 </span>
               </button>
@@ -412,8 +411,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex">
         <aside
-          className="sticky top-[72px] z-[70] hidden h-[calc(100vh-72px)] shrink-0 border-r border-border bg-sidebar lg:block"
-          style={{ width: collapsed ? 76 : 260 }}
+          className={cn("sticky top-16 z-20 hidden h-[calc(100vh-64px)] shrink-0 border-r border-border bg-sidebar lg:block", collapsed ? "w-24" : "w-[260px]")}
         >
           {sidebar}
           <button

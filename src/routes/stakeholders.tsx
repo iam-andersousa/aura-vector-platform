@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Building2, Mail, MessageSquare, PanelRightOpen, Phone, Plus, Search } from "lucide-react";
+import { ArrowRight, Building2, Mail, MessageSquare, PanelRightOpen, Phone, Plus, Search } from "lucide-react";
 import { useState } from "react";
 
 import {
@@ -14,6 +14,7 @@ import {
   VectorSurface,
 } from "@/components/aura/ui";
 import { stakeholders, timeline } from "@/lib/aura-data";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/stakeholders")({
   head: () => ({
@@ -42,16 +43,19 @@ const typeTones: Record<string, "mkt" | "sales" | "cs" | "neutral"> = {
 function StakeholdersPage() {
   const [query, setQuery] = useState("");
   const [type, setType] = useState("Todos");
-  const [selectedId, setSelectedId] = useState(stakeholders[0]!.id);
+  const [selectedId, setSelectedId] = useState(stakeholders[0]?.id);
   const [openNew, setOpenNew] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [actionDetail, setActionDetail] = useState<{ title: string; meta: string; action: string } | null>(null);
+  const [completedActions, setCompletedActions] = useState<string[]>([]);
 
   const filtered = stakeholders.filter(
     (s) =>
       (type === "Todos" || s.type === type) &&
       (s.name + s.company + s.status).toLowerCase().includes(query.toLowerCase()),
   );
-  const selected = stakeholders.find((s) => s.id === selectedId) ?? stakeholders[0]!;
+  const selected = stakeholders.find((s) => s.id === selectedId) ?? stakeholders[0];
+  if (!selected) return <p>Nenhum stakeholder encontrado.</p>;
 
   return (
     <>
@@ -228,7 +232,7 @@ function StakeholdersPage() {
                     ["Responsavel", selected.owner],
                     [
                       "E-mail",
-                      `${selected.name.split(" ")[0].toLowerCase()}@${selected.company
+                      `${(selected.name.split(" ")[0] ?? "contato").toLowerCase()}@${selected.company
                         .toLowerCase()
                         .replace(/\s+/g, "")
                         .replace(/[^a-z]/g, "")}.com.br`,
@@ -303,15 +307,17 @@ function StakeholdersPage() {
                   selected.value,
                   selected.ai ?? "Registrar interacao e revisar risco.",
                 ],
-              ].map(([title, meta, action]) => (
-                <button
+              ].map(([title = "", meta = "", action = ""]) => (
+                <Button variant="ghost"
                   key={title}
-                  className="rounded-xl bg-muted/60 p-3 text-left transition-colors hover:bg-muted"
+                  onClick={() => setActionDetail({ title, meta, action })}
+                  className="h-auto flex-col items-start gap-0 whitespace-normal rounded-lg bg-muted/60 p-3 text-left hover:bg-muted"
                 >
                   <p className="text-[11px] font-medium text-muted-foreground">{meta}</p>
                   <p className="mt-2 text-sm font-medium">{title}</p>
                   <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{action}</p>
-                </button>
+                  <ArrowRight className="mt-3 text-primary" />
+                </Button>
               ))}
             </div>
 
@@ -420,6 +426,20 @@ function StakeholdersPage() {
           </Panel>
         </div>
       </div>
+      <Modal open={actionDetail !== null} onClose={() => setActionDetail(null)} title={actionDetail?.title ?? "Ação recomendada"} subtitle={`${selected.name} · ${selected.company}`}>
+        {actionDetail ? <>
+          <Chip>{actionDetail.meta}</Chip>
+          <p className="mt-4 text-sm text-muted-foreground">{actionDetail.action}</p>
+          <p className="mt-3 text-xs text-muted-foreground">Responsável: {selected.owner}</p>
+          <label className="mt-5 flex items-center gap-3 text-sm">
+            <input type="checkbox" className="h-4 w-4 accent-primary" checked={completedActions.includes(`${selected.id}-${actionDetail.title}`)} onChange={(event) => {
+              const key = `${selected.id}-${actionDetail.title}`;
+              setCompletedActions((previous) => event.target.checked ? [...previous, key] : previous.filter((item) => item !== key));
+            }} />
+            Ação concluída
+          </label>
+        </> : null}
+      </Modal>
     </>
   );
 }
