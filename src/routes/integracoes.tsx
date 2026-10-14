@@ -8,6 +8,8 @@ import { integrations } from "@/lib/aura-data";
 export const Route = createFileRoute("/integracoes")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Integrações — Aura Vector" },
       {
         name: "description",

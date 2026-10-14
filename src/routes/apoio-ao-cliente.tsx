@@ -22,6 +22,8 @@ type AccountSort = "health" | "tickets" | "sla" | "nps";
 export const Route = createFileRoute("/apoio-ao-cliente")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Apoio ao Cliente — Aura Vector" },
       {
         name: "description",

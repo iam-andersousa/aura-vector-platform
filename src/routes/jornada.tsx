@@ -15,6 +15,8 @@ import {
 export const Route = createFileRoute("/jornada")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Jornada - Aura Vector" },
       {
         name: "description",

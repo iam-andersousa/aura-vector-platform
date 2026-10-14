@@ -15,6 +15,8 @@ import { automations } from "@/lib/aura-data";
 export const Route = createFileRoute("/automacoes")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Automações — Aura Vector" },
       {
         name: "description",

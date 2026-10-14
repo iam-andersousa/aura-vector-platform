@@ -30,6 +30,8 @@ function moneyValue(value: string) {
 export const Route = createFileRoute("/marketing")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Marketing — Aura Vector" },
       {
         name: "description",

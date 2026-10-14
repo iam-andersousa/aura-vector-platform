@@ -15,6 +15,8 @@ import { kanbanCards, kanbanColumns, type Stakeholder } from "@/lib/aura-data";
 export const Route = createFileRoute("/kanban")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Kanban RevOps — Aura Vector" },
       {
         name: "description",

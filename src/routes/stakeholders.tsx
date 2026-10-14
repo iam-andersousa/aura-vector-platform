@@ -19,6 +19,8 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/stakeholders")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Stakeholders — Aura Vector" },
       {
         name: "description",

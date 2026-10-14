@@ -22,6 +22,8 @@ import { aiInsights, funnel, kpis, nextActions } from "@/lib/aura-data";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Command Center — Aura Vector" },
       {
         name: "description",
