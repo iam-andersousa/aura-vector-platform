@@ -32,6 +32,7 @@ import vectorIconDark from "@/assets/vector-ai-dark.png";
 import vectorIconLight from "@/assets/vector-ai-light.png";
 import { useTheme } from "@/components/aura/theme";
 import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export function StarMark({ className }: { className?: string }) {
@@ -175,7 +176,7 @@ export function StatCard({
           <div className="flex items-start justify-between gap-3">
             <p className="text-xs font-medium tracking-wide text-muted-foreground">{label}</p>
           </div>
-          <p className="mt-3 text-3xl font-semibold tracking-tight">{value}</p>
+          <p className="mt-3 text-3xl font-display">{value}</p>
           <div className="mt-2 flex items-center gap-2 pr-9 text-xs">
             {delta ? (
               <span
@@ -252,7 +253,7 @@ function MetricModal({
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <p className="text-3xl font-semibold tracking-tight sm:text-4xl">{value}</p>
+          <p className="text-3xl font-display sm:text-4xl">{value}</p>
           {delta ? (
             <span
               className={cn(
@@ -285,7 +286,7 @@ function MetricModal({
         ].map(([k, v]) => (
           <div key={k} className="rounded-xl bg-muted/60 px-3 py-2.5">
             <p className="text-[11px] text-muted-foreground">{k}</p>
-            <p className="mt-1 text-lg font-semibold">{v}</p>
+            <p className="mt-1 text-lg font-display">{v}</p>
           </div>
         ))}
       </div>
@@ -377,13 +378,24 @@ export function Modal({
   className?: string;
   bodyClassName?: string;
 }) {
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
       <div className="overlay-dim absolute inset-0" onClick={onClose} />
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
         className={cn(
-          "surface relative z-10 max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-hidden p-6 shadow-2xl",
+          "surface relative z-10 max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto p-6 shadow-2xl",
           className,
         )}
       >
@@ -519,26 +531,20 @@ export function InsightsBlock({
           aria-hidden
           className="absolute inset-0 h-full w-full object-cover"
         />
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              "linear-gradient(180deg, oklch(0.18 0.03 265 / 18%) 0%, oklch(0.16 0.03 265 / 46%) 60%, oklch(0.14 0.02 265 / 66%) 100%)",
-          }}
-        />
+        <div className="vector-readability absolute inset-0" />
         <div className="relative flex flex-col gap-5 p-6 sm:p-7">
           <VectorIcon onDark className="h-8 w-8" />
           <div className="max-w-2xl">
-            <p className="text-xl font-display leading-snug text-white sm:text-2xl">{title}</p>
-            <p className="mt-2 text-sm leading-relaxed text-white/85">{body}</p>
+            <p className="text-xl font-display leading-snug text-vector-foreground sm:text-2xl">{title}</p>
+            <p className="mt-2 text-sm leading-relaxed text-vector-foreground/85">{body}</p>
           </div>
-          <button
+          <Button variant="ghost" size="icon"
             onClick={() => setOpen(true)}
             aria-label="Ver insights em detalhes"
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur transition-colors hover:bg-white/35"
+            className="h-10 w-10 rounded-full bg-vector-foreground/20 text-vector-foreground hover:bg-vector-foreground/35"
           >
             <ArrowRight className="h-4 w-4" />
-          </button>
+          </Button>
         </div>
       </div>
       <Modal
@@ -555,6 +561,8 @@ export function InsightsBlock({
             return (
               <li key={i}>
                 <button
+                  role="checkbox"
+                  aria-checked={checked}
                   onClick={() => setDone((p) => (checked ? p.filter((x) => x !== i) : [...p, i]))}
                   className="flex w-full items-start gap-3 rounded-xl bg-muted/60 px-3.5 py-3 text-left text-sm transition-colors hover:bg-muted"
                 >

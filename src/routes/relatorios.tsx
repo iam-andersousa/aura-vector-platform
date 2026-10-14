@@ -17,6 +17,8 @@ import { reports } from "@/lib/aura-data";
 export const Route = createFileRoute("/relatorios")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Relatórios — Aura Vector" },
       {
         name: "description",

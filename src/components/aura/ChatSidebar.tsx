@@ -78,7 +78,7 @@ export function ChatSidebar({ collapsed = false }: { collapsed?: boolean }) {
         )}
       >
         <Plus className="h-4 w-4 shrink-0" />
-        {!collapsed ? "Nova conversa" : null}
+        <span className={collapsed ? "text-[10px] leading-tight" : undefined}>Nova conversa</span>
       </button>
 
       <div className="space-y-1">
@@ -93,11 +93,11 @@ export function ChatSidebar({ collapsed = false }: { collapsed?: boolean }) {
                 className={cn(
                   "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
                   expanded && "bg-sidebar-accent text-sidebar-accent-foreground",
-                  collapsed && "justify-center px-0",
+          collapsed && "flex-col justify-center gap-1 px-0",
                 )}
               >
                 <GroupIcon className="h-4 w-4 shrink-0" />
-                {!collapsed ? <span className="flex-1 text-left">{group.label}</span> : null}
+                <span className={collapsed ? "text-[10px] leading-tight" : "flex-1 text-left"}>{group.label}</span>
                 {!collapsed ? (
                   <ChevronDown
                     className={cn("h-3.5 w-3.5 transition-transform", expanded && "rotate-180")}
@@ -236,7 +236,7 @@ export function ChatSidebar({ collapsed = false }: { collapsed?: boolean }) {
         <button
           className={cn(
             "relative flex w-full items-center gap-2 overflow-hidden rounded-xl px-3 py-2.5 text-xs font-medium text-white transition-opacity hover:opacity-90",
-            collapsed && "justify-center px-0",
+                  collapsed && "flex-col justify-center gap-1 px-0",
           )}
         >
           <img

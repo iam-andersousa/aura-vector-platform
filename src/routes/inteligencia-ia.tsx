@@ -15,6 +15,8 @@ import { aiCapabilities } from "@/lib/aura-data";
 export const Route = createFileRoute("/inteligencia-ia")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Insights — Aura Vector" },
       {
         name: "description",

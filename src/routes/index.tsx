@@ -22,6 +22,8 @@ import { aiInsights, funnel, kpis, nextActions } from "@/lib/aura-data";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Command Center — Aura Vector" },
       {
         name: "description",
@@ -125,9 +127,7 @@ function CommandCenter() {
       </section>
 
       <section>
-        <SectionTitle action={<Chip tone="sales">Camada de apoio à decisão</Chip>}>
-          Inteligência artificial
-        </SectionTitle>
+        <SectionTitle>Insights</SectionTitle>
         <InsightsBlock
           title={visibleInsights[0]?.title ?? "Prioridades do Vector para este periodo"}
           body={
