@@ -9,6 +9,7 @@ import {
   Plug,
   Plus,
   Sliders,
+  Square,
   Zap,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -17,6 +18,7 @@ import profilePic from "@/assets/profile-user.png.asset.json";
 import { VectorIcon, VectorSurface } from "@/components/aura/ui";
 import { integrations } from "@/lib/aura-data";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 type Msg = { id: number; role: "user" | "assistant"; text: string };
 export type UserProfile = { name: string; email: string; role: string; avatar: string };
@@ -107,11 +109,48 @@ export function ChatView({
   const [budget, setBudget] = useState(40);
   const [apps, setApps] = useState<string[]>(["HubSpot", "WhatsApp", "Slack"]);
   const [files, setFiles] = useState<string[]>([]);
+  const [recording, setRecording] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [audioError, setAudioError] = useState("");
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const taRef = useRef<HTMLTextAreaElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const selectedMode = modes.find((m) => m.id === mode) ?? modes[0];
-  const hasInput = input.trim().length > 0;
+  const hasInput = input.trim().length > 0 || audioUrl !== null;
+
+  useEffect(() => () => {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+  }, []);
+  useEffect(() => () => {
+    if (audioUrl) URL.revokeObjectURL(audioUrl);
+  }, [audioUrl]);
+
+  const recordAudio = async () => {
+    if (recording) {
+      recorderRef.current?.stop();
+      setRecording(false);
+      return;
+    }
+    setAudioError("");
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      const recorder = new MediaRecorder(stream);
+      const chunks: Blob[] = [];
+      recorder.ondataavailable = (event) => { if (event.data.size) chunks.push(event.data); };
+      recorder.onstop = () => {
+        setAudioUrl(URL.createObjectURL(new Blob(chunks, { type: recorder.mimeType })));
+        stream.getTracks().forEach((track) => track.stop());
+      };
+      recorderRef.current = recorder;
+      recorder.start();
+      setRecording(true);
+    } catch {
+      setAudioError("Não foi possível acessar o microfone. Verifique a permissão do navegador.");
+    }
+  };
 
   useEffect(() => {
     taRef.current?.focus();
@@ -121,7 +160,7 @@ export function ChatView({
   }, [messages]);
 
   const send = (text: string) => {
-    const value = text.trim();
+    const value = text.trim() || (audioUrl ? "Mensagem de áudio anexada" : "");
     if (!value) return;
     const id = Date.now();
     setMessages((m) => [
@@ -131,13 +170,16 @@ export function ChatView({
         id: id + 1,
         role: "assistant",
         text:
-          mode === "foco"
+          audioUrl
+            ? "Áudio recebido nesta demonstração. A transcrição e a análise de áudio ainda não estão conectadas."
+            : mode === "foco"
             ? "Analisei marketing, vendas e apoio ao cliente do período selecionado. Três contas concentram o risco: Nova Lima Tech (health 48), Orbita Log (52) e Grupo Vertex (74, negociação parada há 9 dias). Recomendo QBR de resgate nas duas primeiras e proposta com dois cenários na terceira. Posso criar as tarefas nos apps conectados."
             : "Resumo rápido: 3 contas em risco (Nova Lima Tech, Orbita Log, Grupo Vertex) e 12 oportunidades sem follow-up. Quer que eu crie as tarefas?",
       },
     ]);
     setInput("");
     setFiles([]);
+    setAudioUrl(null);
     requestAnimationFrame(() => taRef.current?.focus());
   };
 
@@ -197,6 +239,9 @@ export function ChatView({
       </div>
 
       <div className="surface mt-4 p-3">
+        {audioUrl ? <audio controls src={audioUrl} className="mb-2 h-9 w-full" aria-label="Áudio gravado" /> : null}
+        {recording ? <p role="status" className="mb-2 text-xs text-primary">Gravando áudio…</p> : null}
+        {audioError ? <p role="alert" className="mb-2 text-xs text-destructive">{audioError}</p> : null}
         {files.length ? (
           <div className="mb-2 flex flex-wrap gap-1.5">
             {files.map((f) => (
@@ -371,18 +416,18 @@ export function ChatView({
             </div>
           </Popover>
 
-          <button
-            onClick={() => send(input)}
-            aria-label={hasInput ? "Enviar mensagem" : "Gravar audio"}
+          <Button variant="ghost" size="icon"
+            onClick={() => { if (recording || !hasInput) void recordAudio(); else send(input); }}
+            aria-label={recording ? "Parar gravação" : hasInput ? "Enviar mensagem" : "Gravar áudio"}
             className={cn(
               "ml-auto flex h-9 w-9 items-center justify-center rounded-full transition-colors",
-              hasInput
+              hasInput || recording
                 ? "bg-primary text-primary-foreground hover:opacity-90"
                 : "bg-muted text-muted-foreground hover:text-foreground",
             )}
           >
-            {hasInput ? <ArrowUp className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-          </button>
+            {recording ? <Square className="h-4 w-4" /> : hasInput ? <ArrowUp className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+          </Button>
         </div>
       </div>
     </div>

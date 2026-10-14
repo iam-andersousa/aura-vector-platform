@@ -125,9 +125,7 @@ function CommandCenter() {
       </section>
 
       <section>
-        <SectionTitle action={<Chip tone="sales">Camada de apoio à decisão</Chip>}>
-          Inteligência artificial
-        </SectionTitle>
+        <SectionTitle>Insights</SectionTitle>
         <InsightsBlock
           title={visibleInsights[0]?.title ?? "Prioridades do Vector para este periodo"}
           body={
